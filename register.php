@@ -2,11 +2,32 @@
 if(isset($_POST['register'])) {
     require('./config/db.php');
 
-    $userName = $_POST["userName"];
-    $userEmail = $_POST["userEmail"];
-    $password = $_POST["password"];
+    // $userName = $_POST["userName"];
+    // $userEmail = $_POST["userEmail"];
+    // $password = $_POST["password"];
+    $userName = filter_var($_POST["userName"], FILTER_SANITIZE_STRING );
+    $userEmail = filter_var($_POST["userEmail"], FILTER_SANITIZE_EMAIL);
+    $password = filter_var($_POST["password"], FILTER_SANITIZE_STRING );
+    $passwordHashed = password_hash($password, PASSWORD_DEFAULT);
 
-    echo $userName . "" . $userEmail . "" . $password;
+    if( filter_var($userEmail, FILTER_VALIDATE_EMAIL) ) {
+        $stmt = $pdo -> prepare('SELECT * from users WHERE email = ? ');
+        $stmt -> execute([$userEmail]);
+        $totalUsers = $stmt -> rowCount();
+
+        // echo $totalUsers . "<br >";
+
+        if( $totalUsers > 0) {
+            // echo "E-mail já foi  adicionado <br>";
+            $emailTaken = "Email já foi adicionado"
+        } else {
+            $stmt2 = $pdo -> prepare('INSERT into user(name, email, password) VALUES(?, ?, ?)');
+            $stmt -> execute( [ $userName, $userEmail, $passwordHashed])
+        } 
+    }
+
+    // echo $userEmail . " " . $userName . " " . $password;
+
 }
     ?>
 
@@ -27,6 +48,10 @@ if(isset($_POST['register'])) {
                 <div class="form-group">
                     <label for="userEmail">E-mail</label>
                     <input required type="email" name="userEmail" class="form-control" />
+                    <br />
+                    <?php if(isset($emailTaken)) { ?>
+                        <p style="background-color: red"><?php echo ?></p>
+                    <?php } $emailTaken ?>
                 </div>
 
                 <div class="form-group">
