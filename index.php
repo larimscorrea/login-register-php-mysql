@@ -1,5 +1,14 @@
 <?php 
-    require('./config/db.php');
+    session_start();
+
+    if( isset($_SESSION['userId'])) {
+        require('./config/db.php');
+
+        $userId = $_SESSION['userId'];
+
+        echo $userId . "<br />";
+    }
+
 ?> 
 <?php require('./inc/header.html'); ?>
 
