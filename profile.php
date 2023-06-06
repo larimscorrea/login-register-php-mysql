@@ -5,10 +5,14 @@
         
         $userId = $_SESSION['userId'];
 
-        if($_POST['edit']) {
+        if( isset($_POST['edit']) ) {
             $userName = filter_var($_POST["userName"], FILTER_SANITIZE_STRING);
-        $userEmail = filter_var($_POST["userEmail"], FILTER_SANITIZE_EMAIL);
-        }
+            $userEmail = filter_var($_POST["userEmail"], FILTER_SANITIZE_EMAIL);
+            $stmt = $pdo -> prepare('UPDATE users SET name=?, email=? WHERE id=?');
+            $stmt->execute([$userName, $userEmail, $userId]);
+
+        }   
+
 
         $stmt = $pdo -> prepare('SELECT * from users WHERE id = ? ');
         $stmt->execute([$userId]);
@@ -16,36 +20,7 @@
         $user = $stmt -> fetch();
 
     }
-
-
-   
-
-        // $userName = $_POST["userName"];
-        // $userEmail = $_POST["userEmail"];
-        // $password = $_POST["password"];
     
-        $password = filter_var($_POST["password"], FILTER_SANITIZE_STRING);
-        $passwordHashed = password_hash($password, PASSWORD_DEFAULT);
-
-        if(filter_var($userEmail, FILTER_VALIDATE_EMAIL)) {
-        $stmt = $pdo -> prepare('SELECT * from users WHERE email = ? ');
-        $stmt -> execute([$userEmail]);
-        $totalUsers = $stmt -> rowCount();
-
-        // echo $totalUsers . '<br >';
-
-            if( $totalUsers > 0) {
-                // echo "E-mail já foi  adicionado <br>";
-                $emailTaken = "Email já foi adicionado";
-                } else {
-                $stmt = $pdo -> prepare('INSERT into user(name, email, password) VALUES(?, ?, ?)');
-                $stmt -> execute( [ $userName, $userEmail, $passwordHashed]);
-            } 
-        }
-
-        // echo $userEmail . " " . $userName . " " . $password;
-
-    }
 ?>
 
 <?php require('./inc/header.html'); ?>
