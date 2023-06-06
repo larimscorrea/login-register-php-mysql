@@ -1,10 +1,29 @@
 <?php
+    session_start();
+
+    if(isset($_SESSION['userId'])) {
+        require('.config/db.php');
+        
+        $userId = $_SESSION['userId'];
+
+        $stmt = $pdo -> prepare('SELECT * from users WHERE id = ? ');
+        $stmt->execute([$userId]);
+
+        $user = $stmt -> fetch();
+
+    }
+    
+?>
+
+<?php require('./inc/header.html'); ?>
+
+<?php
 // Conexão com o banco de dados
 $host = 'localhost';
-$port = 5432;
-$dbname = 'seu_banco_de_dados';
-$user = 'seu_usuario';
-$password = 'sua_senha';
+$port = 3006;
+$dbname = 'cpdrogas';
+$user = 'coinp';
+$password = 'dev12345';
 
 $dsn = "pgsql:host=$host;port=$port;dbname=$dbname;user=$user;password=$password";
 $client = new PDO($dsn);
@@ -441,8 +460,17 @@ if (isset($_POST['bairro'])) {
                         <li><input type="radio"  class="radio-input" value="nao-responder" id="field" name='radio'/>
                             Prefiro não responder.</li>
                     </ul>
+                        <label for="question-objetiva">Por qual meio tentou suicidio?</label>
+                        <input type="text">
+
+                        <label for="">Há quanto tempo?</label>
+                        <input type="text">
+                    <div>
+
+</div>
                 </div>
                 
+
 
                 <label class="question-objetiva">Qual é a expectativa do usuário e/ou da família em relação a esse atendimento?</label>
                 <div class="checkbox-field">
