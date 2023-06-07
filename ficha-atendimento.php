@@ -71,16 +71,18 @@ $genero = $_POST['genero'];
 $gestante = $_POST['gestante'];
 
 function possivelGestante($genero, $gestante) {
-    if(($_SERVER['REQUEST_METHOD'] == 'POST')); {
+    if($_SERVER['REQUEST_METHOD'] == 'POST'); {
        $selectOption = $_POST['genero']; 
         echo "Opção selecionada: " . $selectOption;
         echo "<p>Gestante?</p>";
-        echo "<label><input type='radio' name='opcao' value='Sim' <?php if ($opcaoSelecionada == 'sim'); /> Sim</label> 
-        <label><input type='radio' name='opcao' value='Nao' <?php if ($opcaoSelecionada == 'nao'); /> Não </label>";
-      } else {
-        echo "<p>Você não é gestante. </p>";
-      }
-};
+        echo "<label><input type='radio' name='opcao' value='Sim' " . ($opcaoSelecionada == 'sim' ? 'checked' : '') . " /> Sim</label> 
+              <label><input type='radio' name='opcao' value='Nao' " . ($opcaoSelecionada == 'nao' ? 'checked' : '') . " /> Não</label>";
+    } else {
+        echo "<p>Você não é gestante.</p>";
+    }
+
+    possivelGestante($genero, $gestante);
+
 ?>
 
 <?php
