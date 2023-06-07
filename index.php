@@ -6,9 +6,9 @@
 
         $userId = $_SESSION['userId'];
 
-        $stmt = $pdo -> prepare('SELECT * FROm users WHERE id = ? ')
+        $stmt = $pdo -> prepare('SELECT * FROm users WHERE id = ? ');
 
-        $stmt -> execute ([ $userId ]);
+        $stmt->execute ([ $userId ]);
 
         $user = $stmt ->fetch();
 
@@ -37,7 +37,7 @@
     <div class="card-body">
         <h5>Este é um super conteúdo secreto que só pessoas logadas podem ter acesso </h5>
         <?php } else { ?>
-    <h4>Por favor faça seu login ou registre-se</h4>
+    <h4>Por favor faça seu <a href="login.php"> login </a> ou <a href="register.php">registre-se</a></h4>
     <?php } ?> 
 </div>
 
