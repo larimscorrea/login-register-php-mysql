@@ -6,11 +6,11 @@
 }
 
 body {
-    background-color: orange;
+    background-color: #26a96c;
 }
 
 nav {
-    background-color: royalblue;
+    background-color: #2bc016;
     padding: 15px 25px;
     display: flex;
     justify-content: space-between;
@@ -43,3 +43,5 @@ nav a {
 .card {
     margin-top: 50px;
 }
+
+

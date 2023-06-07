@@ -1,34 +1,19 @@
 <?php
-    session_start();
+    if(isset($_POST['ficha'])) {
+        require('.config/db.php'); 
 
-    if(isset($_SESSION['userId'])) {
-        require('.config/db.php');
-        
-        $userId = $_SESSION['userId'];
+        $stmt = $pdo -> prepare('SELECT * from datas WHERE id = ? ');
 
-        $stmt = $pdo -> prepare('SELECT * from users WHERE id = ? ');
-        $stmt->execute([$userId]);
-
+        $stmt->execute([$datas]);
         $user = $stmt -> fetch();
-
     }
-    
 ?>
 
 <?php require('./inc/header.html'); ?>
 
 <?php
-// Conexão com o banco de dados
-$host = 'localhost';
-$port = 3006;
-$dbname = 'cpdrogas';
-$user = 'coinp';
-$password = 'dev12345';
 
-$dsn = "pgsql:host=$host;port=$port;dbname=$dbname;user=$user;password=$password";
-$client = new PDO($dsn);
-
-$query = 'SELECT * FROM sua_tabela';
+$query = 'SELECT * FROM datas WHERE ';
 $result = $client->query($query);
 $rows = $result->fetchAll(PDO::FETCH_ASSOC);
 print_r($rows);
@@ -70,7 +55,6 @@ function testaCPF($strCPF) {
     return true;
 }
 
-// Código restante...
 // Chamada da função para validar CPF
 $cpf = '12345678901';
 if (testaCPF($cpf)) {
@@ -82,60 +66,21 @@ if (testaCPF($cpf)) {
 ?>
 
 <?php
-// Abre um campo extra para o preenchimento de informação em caso de ser selecionada a opção determinada.
-echo "<script>";
-echo "$(document).ready(function() {";
-echo "  $('#inputOculto').hide();";
-echo "  $('.mySelect').change(function() {";
-echo "    if ($('.mySelect').val() == 'Teleatendimento psicossocial via SISGEP' || $('.mySelect').val() == 'Outro tipo de atendimento realizado') {";
-echo "      $('#inputOculto').show();";
-echo "    } else {";
-echo "      $('#inputOculto').hide();";
-echo "    }";
-echo "  });";
-echo "});";
-
-echo "$(document).ready(function() {";
-echo "  $('#inputOcultoAjuda').hide();";
-echo "  $('.select-ajuda').change(function() {";
-echo "    if ($('.select-ajuda').val() == 'Outras pessoas') {";
-echo "      $('#inputOcultoAjuda').show();";
-echo "    } else {";
-echo "      $('#inputOcultoAjuda').hide();";
-echo "    }";
-echo "  });";
-echo "});";
-
-echo "$(document).ready(function() {";
-echo "  $('#inputOculto-genero').hide();";
-echo "  $('.select-outro').change(function() {";
-echo "    if ($('.select-outro').val() == 'Outro') {";
-echo "      $('#inputOculto-genero').show();";
-echo "    } else {";
-echo "      $('#inputOculto-genero').hide();";
-echo "    }";
-echo "  });";
-echo "});";
-echo "</script>";
-?>
-
-
-<?php
 // Abre um input na questão do gênero
-echo "<script>";
-echo "var genero = document.getElementById('select-genero');";
-echo "var gestante = document.getElementById('genero-gestante');";
+$genero = $_POST['genero'];
+$gestante = $_POST['gestante'];
 
-echo "genero.addEventListener('change', function selectGenero(){";
-echo "  if(genero.value == 'htrans') {";
-echo "    gestante.textContent = 'Gestante?';"; 
-echo "  } else if(genero.value == 'mcis') {";
-echo "    gestante.textContent = 'Gestante?';";
-echo "  } else {";
-echo "    genero.textContent = 'Você não é gestante.';";
-echo "  }";
-echo "});";
-echo "</script>";
+function possivelGestante($genero, $gestante) {
+    if(($_SERVER['REQUEST_METHOD'] == 'POST')); {
+       $selectOption = $_POST['genero']; 
+        echo "Opção selecionada: " . $selectOption;
+        echo "<p>Gestante?</p>";
+        echo "<label><input type='radio' name='opcao' value='Sim' <?php if ($opcaoSelecionada == 'sim'); /> Sim</label> 
+        <label><input type='radio' name='opcao' value='Nao' <?php if ($opcaoSelecionada == 'nao'); /> Não </label>";
+      } else {
+        echo "<p>Você não é gestante. </p>";
+      }
+};
 ?>
 
 <?php
@@ -147,7 +92,7 @@ $locais = array(
 );
 ?>
 
-<form method="post">
+<form action="ficha-atendimento.php" method="POST">
     <label for="bairro">Selecione um bairro:</label>
     <select name="bairro" id="bairro">
         <option value="">Selecione</option>
@@ -230,7 +175,7 @@ if (isset($_POST['bairro'])) {
           <div class="box-dados-iniciais">
             <div class="box-dados">
             <label class="question-objetiva">Gênero</label>
-          <select id="select-genero" class="select select-outro" onclick="selectGenero()">
+          <select id="select-genero" class="select select-outro" onclick="selectGenero()" name="genero">
             <option value=""></option>
             <option value="hcis">Homem cis</option>
             <option value="htrans">Homem trans</option>
