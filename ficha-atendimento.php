@@ -65,14 +65,14 @@ if (testaCPF($cpf)) {
 
 ?>
 
+
 <?php
 // Abre um input na questão do gênero
 $genero = $_POST['genero'];
 $gestante = $_POST['gestante'];
-
 function possivelGestante($genero, $gestante) {
-    if($_SERVER['REQUEST_METHOD'] == 'POST'); {
-       $selectOption = $_POST['genero']; 
+    if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+        $selectOption = $_POST['genero']; 
         echo "Opção selecionada: " . $selectOption;
         echo "<p>Gestante?</p>";
         echo "<label><input type='radio' name='opcao' value='Sim' " . ($opcaoSelecionada == 'sim' ? 'checked' : '') . " /> Sim</label> 
@@ -80,41 +80,139 @@ function possivelGestante($genero, $gestante) {
     } else {
         echo "<p>Você não é gestante.</p>";
     }
+}
 
-    possivelGestante($genero, $gestante);
+// Chamada da função
+possivelGestante($genero, $gestante);
 
 ?>
 
 <?php
+
 $locais = array(
     "aerolandia" => "Regional 6 e território 26",
     "aeroporto" => "Regional 4 e território 18",
     "aldeota" => "Regional 2 e território 7",
-    // Adicione mais bairros e seus respectivos locais aqui...
+    "altodabalanca" => "Regional 6 e território 27",
+    "alvaroweyne" => "Regional 2 e território 7",
+    "amadeufurtado" => "Regional 1 e território 4",
+    "antoniobezerra" => "Regional 3 e território 13",
+    "barradoceara" => "Regional 1 e território 2",
+    "belavista" => "Regional 6 e território 27",
+    "benfica" => "Regional 1 e território 3",
+    "bomfuturo" => "Regional 3 e território 13",
+    "boavista" => "Regional 3 e território 11",
+    "bomjardim" => "Regional 3 e território 12",
+    "bonsucesso" => "Regional 3 e território 12",
+    "caisdoporto" => "Regional 1 e território 1",
+    "cajazeiras" => "Regional 3 e território 12",
+    "cambeba" => "Regional 4 e território 18",
+    "carlitopamplona" => "Regional 2 e território 7",
+    "centro" => "Regional 1 e território 1",
+    "cidade2" => "Regional 2 e território 6",
+    "cidadedosf" => "Regional 4 e território 17",
+    "coac" => "Regional 5 e território 20",
+    "coco" => "Regional 4 e território 17",
+    "conjuntoceara1" => "Regional 5 e território 20",
+    "conjuntoceara2" => "Regional 5 e território 20",
+    "cristoredentor" => "Regional 2 e território 6",
+    "curio" => "Regional 6 e território 26",
+    "damas" => "Regional 2 e território 6",
+    "delourdes" => "Regional 1 e território 3",
+    "democritorocha" => "Regional 5 e território 21",
+    "dende" => "Regional 6 e território 25",
+    "dionisiotorres" => "Regional 2 e território 7",
+    "domlustosa" => "Regional 4 e território 17",
+    "dunas" => "Regional 4 e território 17",
+    "edsonqueiroz" => "Regional 4 e território 18",
+    "fariasbrito" => "Regional 1 e território 2",
+    "floresta" => "Regional 1 e território 3",
+    "genibau" => "Regional 5 e território 21",
+    "guajeru" => "Regional 6 e território 26",
+    "granjaportugal" => "Regional 5 e território 21",
+    "granjalisboa" => "Regional 5 e território 20",
+    "henriquejorge" => "Regional 4 e território 17",
+    "itaoca" => "Regional 6 e território 26",
+    "itaperi" => "Regional 4 e território 16",
+    "jacarecanga" => "Regional 1 e território 1",
+    "jardimamerica" => "Regional 2 e território 6",
+    "jardimguanabara" => "Regional 4 e território 17",
+    "jardimdasoliveiras" => "Regional 5 e território 19",
+    "jardimiracema" => "Regional 2 e território 6",
+    "joaquimtavora" => "Regional 2 e território 7",
+    "josebonifacio" => "Regional 1 e território 3",
+    "josedealencar" => "Regional 5 e território 21",
+    "lagoaredonda" => "Regional 4 e território 17",
+    "maraponga" => "Regional 4 e território 16",
+    "meireles" => "Regional 2 e território 5",
+    "messejana" => "Regional 6 e território 26",
+    "montese" => "Regional 4 e território 16",
+    "mondubim" => "Regional 4 e território 17",
+    "montecastelo" => "Regional 1 e território 3",
+    "mourabrasil" => "Regional 2 e território 5",
+    "mucuripe" => "Regional 2 e território 5",
+    "otaviobonfim" => "Regional 2 e território 5",
+    "olavooliveira" => "Regional 4 e território 16",
+    "padreandrade" => "Regional 1 e território 3",
+    "papicu" => "Regional 2 e território 5",
+    "paupina" => "Regional 6 e território 26",
+    "parangaba" => "Regional 4 e território 17",
+    "parreao" => "Regional 4 e território 17",
+    "parquearaxa" => "Regional 6 e território 26",
+    "parqueiracema" => "Regional 2 e território 6",
+    "parquelandia" => "Regional 1 e território 3",
+    "parquemanibura" => "Regional 6 e território 25",
+    "parquesantamaria" => "Regional 5 e território 19",
+    "parquesaojose" => "Regional 6 e território 26",
+    "passare" => "Regional 4 e território 17",
+    "pedras" => "Regional 2 e território 7",
+    "pici" => "Regional 4 e território 16",
+    "pirambu" => "Regional 1 e território 1",
+    "praiadeiracema" => "Regional 2 e território 5",
+    "praiadofuturoi" => "Regional 2 e território 5",
+    "praiadofuturoii" => "Regional 2 e território 5",
+    "prainha" => "Regional 2 e território 5",
+    "presidentekennedy" => "Regional 4 e território 18",
+    "quintinocunha" => "Regional 3 e território 13",
+    "rodrigotorres" => "Regional 1 e território 2",
+    "sabia" => "Regional 6 e território 25",
+    "salinasaerolandia" => "Regional 6 e território 26",
+    "santafelicidade" => "Regional 5 e território 19",
+    "santamaria" => "Regional 6 e território 25",
+    "serrinha" => "Regional 6 e território 27",
+    "silvionor" => "Regional 4 e território 17",
+    "sitioconde" => "Regional 4 e território 18",
+    "sitioverde" => "Regional 4 e território 18",
+    "tancredoneves" => "Regional 3 e território 14",
+    "vilaellery" => "Regional 3 e território 13",
+    "vilalobos" => "Regional 4 e território 16",
+    "vilamanuelsatiro" => "Regional 3 e território 13",
+    "vilarodrigues" => "Regional 3 e território 13"
 );
-?>
 
-<form action="ficha-atendimento.php" method="POST">
-    <label for="bairro">Selecione um bairro:</label>
+$bairro = "messejana";
+if (isset($locais[$bairro])) {
+    echo "O bairro $bairro está localizado na " . $locais[$bairro];
+} else {
+    echo "Não há informações disponíveis para o bairro $bairro.";
+};
+?>
+<label for="bairro">Selecione um bairro:</label>
     <select name="bairro" id="bairro">
         <option value="">Selecione</option>
         <?php foreach ($locais as $bairro => $local) { ?>
             <option value="<?php echo $bairro; ?>"><?php echo $bairro; ?></option>
         <?php } ?>
     </select>
-    <input type="submit" value="Obter Local">
+    <input type="submit" value="Obter Local" />
 </form>
-
 <?php
 if (isset($_POST['bairro'])) {
     $bairro = $_POST['bairro'];
     $local = isset($locais[$bairro]) ? $locais[$bairro] : "Bairro não encontrado";
-    
     echo "<p>Local: $local</p>";
 }
 ?>
-
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -142,17 +240,17 @@ if (isset($_POST['bairro'])) {
         
         <section class="parte-um">
             <label class="question-objetiva">Qual é o tipo de atendimento realizado?</label>
-            <select id="field" name="select-atendimento" class="select mySelect">
+            <select id="field" name="select-atendimento" class="select mySelect" required>
                 <option></option>
-                <option onclick="myInput()">Teleatendimento psicossocial via SISGEP</option> 
+                <option>Teleatendimento psicossocial via SISGEP</option> 
                 <option>Teleatendimento psicossocial realizado via demanda espontânea</option>
                 <option>Teleatendimento psicossocial presencial realizado externamente</option>
                 <option>Outro tipo de atendimento realizado</option>
               </select>
-              <div id="inputOculto"> Nº do protocolo:
+              <div id="inputOculto"> Nº do protocolo do atendimento SISGEP:
                 <input type="text" class="input-text" />
               </div>
-            <label class="question-objetiva">Quem procurou ajuda/tratamento?</label>
+            <label class="question-objetiva" required>Quem procurou ajuda/tratamento?</label>
             <select id="field" class="select select-ajuda">
                 <option></option>
                 <option>Usuário</option>
@@ -163,11 +261,11 @@ if (isset($_POST['bairro'])) {
                 <option>Técnicos de instituições</option>
                 <option>Outras pessoas</option>
             </select>
-            <div id="inputOcultoAjuda"> Qual(is)?
+            <div id="inputOcultoAjuda" required> Qual(is) outras pessoas procuraram ajuda/tratamento?
               <input type="text" class="input-text" />
             </div>
                 <div class="box-conhecimento">
-                <label class="question-objetiva">Como ficou sabendo do serviço?</label>
+                <label class="question-objetiva" required>Como ficou sabendo do serviço?</label>
                 <input type="text" class="input-text" id="field" >
                 </div>  
                 
@@ -176,7 +274,7 @@ if (isset($_POST['bairro'])) {
             <h3>Dados Sociodemográficos</h3>
           <div class="box-dados-iniciais">
             <div class="box-dados">
-            <label class="question-objetiva">Gênero</label>
+            <label class="question-objetiva" required>Gênero</label>
           <select id="select-genero" class="select select-outro" onclick="selectGenero()" name="genero">
             <option value=""></option>
             <option value="hcis">Homem cis</option>
@@ -191,7 +289,7 @@ if (isset($_POST['bairro'])) {
             <input type="text" /></div>
 
         <div class="box-dados">
-          <label class="question-objetiva">Idade</label>
+          <label class="question-objetiva" required>Idade</label>
           <input type="number" min="0" class="number-input" id="field"/> 
       </div>
           </div>
@@ -201,7 +299,7 @@ if (isset($_POST['bairro'])) {
         <div class="box-local">
             <div class="box-bairro">
                 <p class="questoes-3">Bairro:</p>
-                <select class="select select-bairro" name="select" id="select-bairro"> 
+                <select class="select select-bairro" name="select" id="select-bairro" required> 
                   <option value=""></option>
                   <option value="aerolandia">Aerolândia</option>
                   <option value="aeroporto">Aeroporto</option>
@@ -304,7 +402,7 @@ if (isset($_POST['bairro'])) {
               </select>
               <div id="local"></div>
             </div>
-        <div class="box-rua">
+        <div class="box-rua" required>
             <label>Em situação de rua: </label>
             <div class="inputs-rua">
                 <div class="input-radio">
@@ -321,7 +419,7 @@ if (isset($_POST['bairro'])) {
             </div>
         </div>
         </div>
-        <label>Número de crianças que residem na casa (usuário ou familiar): </label>
+        <label required>Número de crianças que residem na casa (usuário ou familiar): </label>
         <div class="inputs-numbers--kids">
         <input type="number" min="0" class="number-input" id="field"/> <p>Crianças de 0-5 anos</p>
         <input type="number" min="0" class="number-input" id="field"/> <p>Crianças de 6-11 anos</p>
@@ -333,7 +431,7 @@ if (isset($_POST['bairro'])) {
         <section class="parte-tres">
             <h3>Dados de Atenção e Cuidado </h3>
             <div class="box-wrapper-subs">
-                <label class="question-objetiva">Qual(is) tipo(s) de substâncias psicoativas já fez uso na vida?</label>
+                <label class="question-objetiva" required>Qual(is) tipo(s) de substâncias psicoativas já fez uso na vida?</label>
                 <div class="checkbox-field">
                     <ul>
                         <li><input type="checkbox" id="field"> Álcool</li>
@@ -365,18 +463,18 @@ if (isset($_POST['bairro'])) {
                         </ul>
                 </div>
 
-                <label class="question-objetiva">Qual é a primeira substância que você fez uso?</label>
+                <label class="question-objetiva" required>Qual é a primeira substância que você fez uso?</label>
                 <input type="text" class="input-text" id="field">
-                <label class="question-objetiva">Qual ou quais substâncias faz uso atualmente</label>
+                <label class="question-objetiva" required>Qual ou quais substâncias faz uso atualmente</label>
                 <input type="text" class="input-text" id="field">
-                <label class="question-objetiva">Usa há quanto tempo?</label>
+                <label class="question-objetiva" required>Usa há quanto tempo?</label>
                 <input type="text" class="input-text" id="field">
-                <label class="question-objetiva">Quanto tempo após iniciar o uso procurou tratamento pela primeira vez?</label>
+                <label class="question-objetiva" required>Quanto tempo após iniciar o uso procurou tratamento pela primeira vez?</label>
                 <input type="text" class="input-text" id="field">
-                <label class="question-objetiva">Onde procurou ajuda/tratamento pela primeira vez?</label>
+                <label class="question-objetiva" required>Onde procurou ajuda/tratamento pela primeira vez?</label>
                 <input type="text" class="input-text" id="field">
 
-                <label class="question-objetiva">Qual ou quais órgãos/instituições que faz atendimento a usuários de álcool e/ou outras drogas você já foi atendido?</label>
+                <label class="question-objetiva" required>Qual ou quais órgãos/instituições que faz atendimento a usuários de álcool e/ou outras drogas você já foi atendido?</label>
                 <div class="checkbox-field">
                     <ul><li><input type="checkbox" id="field"> CAPS AD</li>
                         <li><input type="checkbox" id="field"> Unidade básica de saúde</li>
@@ -397,7 +495,7 @@ if (isset($_POST['bairro'])) {
                                 <input type="text" class="input-text" id="field"></li> 
                         </ul>
                 </div>
-                <label class="question-objetiva">Já pensou em suicídio alguma vez</label>
+                <label class="question-objetiva" required>Já pensou em suicídio alguma vez</label>
                 <div class="input-radio">
                     <ul class="radio-list">
                         <li><input type="radio" class="radio-input" value="sim" id="field" name='radio'/> Sim
@@ -407,7 +505,7 @@ if (isset($_POST['bairro'])) {
                         <li><input type="radio"  class="radio-input" value="nao-responder" id="field" name='radio'/>
                             Prefiro não responder.</li>
                     </ul>
-                        <label for="question-objetiva">Por qual meio tentou suicidio?</label>
+                        <label for="question-objetiva" required>Por qual meio tentou suicidio?</label>
                         <input type="text">
 
                         <label for="">Há quanto tempo?</label>
@@ -419,7 +517,7 @@ if (isset($_POST['bairro'])) {
                 
 
 
-                <label class="question-objetiva">Qual é a expectativa do usuário e/ou da família em relação a esse atendimento?</label>
+                <label class="question-objetiva" required>Qual é a expectativa do usuário e/ou da família em relação a esse atendimento?</label>
                 <div class="checkbox-field">
                     <ul> <strong>Internação</strong>
                         <li> <input type="checkbox" id="field"/> Internação voluntária</li>
@@ -437,7 +535,7 @@ if (isset($_POST['bairro'])) {
 
                     </ul>
                 </div>
-                <label class="question-objetiva">Gostaria de atendimento presencial na CPDrogas?</label>
+                <label class="question-objetiva" required>Gostaria de atendimento presencial na CPDrogas?</label>
                 <ul class="radio-list">
                     <li><input type="radio" class="radio-input" value="sim" id="field" name='radio'/> Sim
                     </li>
@@ -445,13 +543,14 @@ if (isset($_POST['bairro'])) {
                 
                 </ul>
 
-                <h5 class="question-objetiva">Relato do atendimento</h5>
+                <h5 class="question-objetiva" required>Relato do atendimento</h5>
                 <input type="text" class="input-text" id="field">
                 
                 <h5 class="question-objetiva">Encaminhamento</h5>
                 <input type="text" class="input-text" id="field">
 
-                <p class="question-objetiva">Fortaleza</p> <input type="datetime-local" class="input-text"/>
+                <p class="question-objetiva">Fortaleza</p> <input type="datetime-local" class="input-text"/> 
+                <!-- //substituir por função que pega data e hora;  -->
                 <p class="question-objetiva">Profissional responsável pelo acolhimento/encaminhamento</p> <input type="text" class="input-text" id="field">
 
                <div class="button">
