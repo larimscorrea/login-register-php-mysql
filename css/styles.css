@@ -34,6 +34,18 @@ nav a {
     color: #fff;
     margin-right: 5px;
     margin-left: 5px;
+    text-transform: lowercase;
+    letter-spacing: 5px;
+}
+
+a {
+    text-decoration: none;
+    color: #f21b3f;
+    text-shadow: #26a96c;
+}
+
+a:hover {
+    text-decoration: 1px dashed black;
 }
 
 .container {
