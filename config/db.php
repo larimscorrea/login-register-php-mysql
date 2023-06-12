@@ -2,7 +2,7 @@
 $host = 'localhost';
 $user = 'root';
 $password = '';
-$dbname = 'login-project';
+$dbname = 'cpdrogas';
 
 $dsn = 'mysql:host=' . $host . ';dbname' . $dbname;
 
