@@ -1,22 +1,32 @@
 <?php
 
     if(isset($_POST['register'])) {
-        require('./config/db.php');
-
+        // require('./config/db.php');
+        include("db.php");
         // $userName = $_POST["userName"];
         // $userEmail = $_POST["userEmail"];
         // $password = $_POST["password"];
         $userName = filter_var($_POST["userName"], FILTER_SANITIZE_STRING);
         $userEmail = filter_var($_POST["userEmail"], FILTER_SANITIZE_EMAIL);
         $password = filter_var($_POST["password"], FILTER_SANITIZE_STRING);
-        $passwordHashed = password_hash($_POST["password"], PASSWORD_DEFAULT);
+        $passwordHashed = password_hash($password, PASSWORD_DEFAULT);
+
+        $sql="INSERT into users(id, name, email, password, role) 
+            VALUES (?, '$userName', '$userEmail', '$password', '?')";
+
+            if(msqli_query($connection, $sql)) {
+                echo "Usuário cadastrado com sucesso";
+            } else {
+                echo "Erro".mysqli_connect_error($connection);
+            } 
+            mysqli_close($connection);
 
         if(filter_var($userEmail, FILTER_VALIDATE_EMAIL)) {
         $stmt = $pdo -> prepare('SELECT * from users WHERE email = ? ');
         $stmt -> execute([$userEmail]);
         $totalUsers = $stmt -> rowCount();
 
-        // echo $totalUsers . '<br >';
+        echo $totalUsers . '<br >';
 
             if( $totalUsers > 0) {
                 // echo "E-mail já foi  adicionado <br>";

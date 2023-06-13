@@ -1,28 +1,27 @@
 <?php
 
-    if(isset($_POST['register'])) {
+    if(isset($_POST['login'])) {
         require('./config/db.php');
 
         $userEmail = filter_var($_POST["userEmail"], FILTER_SANITIZE_EMAIL);
         $password = filter_var($_POST["password"], FILTER_SANITIZE_STRING);
 
+        $stmt = $pdo->prepare('SELECT * FROM users WHERE email = ?');
+        $stmt->execute([$userEmail]);
+        $user = $stmt->fetch();
 
-
-        $stm = $pdo -> prepare('SELECT * FROM users WHERE email = ?');
-        $stmt -> execute([$userEmail]);
-        $user = $stmt ->fetch();
-
-        if( isset($user) ) {
-            if( password_verify($password, $user -> password )) {
-             echo "A senha está correta";
-             $_SESSION['userId'] = $user -> id;
-             header('Localização: coloque aqui o link');
-            } else {
-                // echo "O e-mail ou a senha do login está errado";
-                $wrongLogin = "O e-mail ou a senha do login está errado";
-
-            }
+        if ($user !== false) {
+        if (password_verify($password, $user->password)) {
+        echo "A senha está correta";
+        $_SESSION['userId'] = $user->id;
+        header('Location: http://localhost/cpdrogas/index.php');
+        exit;
+        } else {
+        $wrongLogin = "O e-mail ou a senha do login está errado!";
         }
+    } else {
+    $wrongLogin = "O e-mail ou a senha do login está errado!";
+    }
         // if(filter_var($userEmail, FILTER_VALIDATE_EMAIL)) {
         // $stmt = $pdo -> prepare('SELECT * from users WHERE email = ? ');
         // $stmt -> execute([$userEmail]);
@@ -59,7 +58,7 @@
                     <input required type="email" name="userEmail" class="form-control" />
                     <br />
                     <?php if(isset($wrongLogin)) { ?>
-                        <p style="background-color: red"><?php echo $wrongLogin ?></p>
+                        <p style="color: red"><?php echo $wrongLogin ?></p>
                     <?php } $wrongLogin ?>
                 </div>
 
