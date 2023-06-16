@@ -20,57 +20,127 @@ print_r($rows);
 
 $client = null;
 
-// Validador de CPF
-function testaCPF($strCPF) {
-    $soma = 0;
-
-    if ($strCPF == "00000000000") return false;
-    if ($strCPF == "11111111111") return false;
-    if ($strCPF == "22222222222") return false;
-    if ($strCPF == "33333333333") return false;
-    if ($strCPF == "44444444444") return false;
-    if ($strCPF == "55555555555") return false;
-    if ($strCPF == "66666666666") return false;
-    if ($strCPF == "77777777777") return false;
-    if ($strCPF == "88888888888") return false;
-    if ($strCPF == "99999999999") return false;
-
-    for ($i = 1; $i <= 9; $i++) {
-        $soma += intval(substr($strCPF, $i - 1, 1)) * (11 - $i);
-    }
-
-    $resto = ($soma * 10) % 11;
-    if (($resto == 10) || ($resto == 11)) $resto = 0;
-    if ($resto != intval(substr($strCPF, 9, 1))) return false;
-
-    $soma = 0;
-    for ($i = 1; $i <= 10; $i++) {
-        $soma += intval(substr($strCPF, $i - 1, 1)) * (12 - $i);
-    }
-
-    $resto = ($soma * 10) % 11;
-    if (($resto == 10) || ($resto == 11)) $resto = 0;
-    if ($resto != intval(substr($strCPF, 10, 1))) return false;
-
-    return true;
-}
-
-// Chamada da função para validar CPF
-$cpf = '12345678901';
-if (testaCPF($cpf)) {
-    echo "CPF válido";
+if(isset($_POST['numberFicha'])) {
+    $fichaNumber = $_POST['$fichaNumber'];
 } else {
-    echo "CPF inválido";
+    echo "<p style='color: red' >Campo Nº da ficha não está definido.</p>";
 }
+
+// Implementações próximas:
+// - Teste: verificar se o dado está ficando armazenado no banco de dados na tabela específica.
+
+//Implementação futura:
+//Sistema gerar um número de ficha baseado em um algoritmo criado para o próprio sistema.
+
+if(isset($_POST['cpfNumber'])) {
+    $cpfNumber = $_POST['cpfNumber']; 
+
+    //Validador de cpf
+    function testaCPF($strCPF) {
+        $soma = 0;
+    
+        if ($strCPF == "00000000000") return false;
+        if ($strCPF == "11111111111") return false;
+        if ($strCPF == "22222222222") return false;
+        if ($strCPF == "33333333333") return false;
+        if ($strCPF == "44444444444") return false;
+        if ($strCPF == "55555555555") return false;
+        if ($strCPF == "66666666666") return false;
+        if ($strCPF == "77777777777") return false;
+        if ($strCPF == "88888888888") return false;
+        if ($strCPF == "99999999999") return false;
+    
+        for ($i = 1; $i <= 9; $i++) {
+            $soma += intval(substr($strCPF, $i - 1, 1)) * (11 - $i);
+        }
+    
+        $resto = ($soma * 10) % 11;
+        if ($resto == 10 || $resto == 11) $resto = 0;
+        if ($resto != intval(substr($strCPF, 10, 1))) return false;
+    
+        $soma = 0;
+        for ($i = 1; $i <= 10; $i++) {
+            $soma += intval(substr($strCPF, $i - 1, 1)) * (12 - $i);
+        }
+    
+        $resto = ($soma * 10) % 11;
+        if ($resto == 10 || $resto == 11) $resto = 0;
+        if ($resto != intval(substr($strCPF, 10, 1))) return false;
+    
+        return true;
+    }
+    
+    // Chamada da função para validar CPF
+    if (testaCPF($cpfNumber)) {
+        echo "<p style='color: green'> CPF válido</p>";
+    } else {
+        echo "<p style='color: red'> CPF inválido</p>";
+    }
+    
+} else {
+    echo "Campo CPF não está definido.";
+}
+
+// Implementações próximas:
+// - Teste: verificar se o dado está ficando armazenado no banco de dados na tabela específica.
+
+//Implementações futuras:
+// - O código verificar na busca na base de dados se o CPF digitado já possui ficha no sistema.
 
 ?>
 
+<?php
+
+$ajuda = $_POST['ajuda'];
+
+function quemAjuda() {
+    if(isset($_POST['ajuda'])) {
+        $ajuda = $_POST['ajuda'];
+
+        switch ($ajuda) {
+        case "Usuário":
+            break;
+        
+        case "Usuário e família":
+            break;
+        
+        case "Família":
+            break;
+        
+        case "Amigos e conhecidos":
+            break;
+        
+        case "Promotorias de Justiça":
+            break;
+        
+        case "Técnicos de instituições":
+            break;
+
+        default: 
+        break;
+
+        } 
+    }
+}
+
+quemAjuda();
+
+?>
+
+<?php 
+
+if(isset($_POST['comoSoube'])) {
+    $comoSoube = $_POST['comoSoube'];
+} else {
+    echo "";
+}
+
+?>
 
 <?php
 // Abre um input na questão do gênero
 $genero = $_POST['genero'] ?? '';
 $gestante = $_POST['gestante'] ?? '';
-$opcaoSelecionada; 
 
 function possivelGestante($genero, $gestante) {
     if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -87,7 +157,6 @@ function possivelGestante($genero, $gestante) {
 
 // Chamada da função
 possivelGestante($genero, $gestante);
-
 ?>
 
 <?php
@@ -193,7 +262,7 @@ $locais = array(
     "vilarodrigues" => "Regional 3 e território 13"
 );
 
-$bairro = "messejana";
+$bairro = '';
 if (isset($locais[$bairro])) {
     echo "O bairro $bairro está localizado na " . $locais[$bairro];
 } else {
@@ -278,18 +347,19 @@ if (isset($_POST['bairro'])) {
           <div class="box-dados-iniciais">
             <div class="box-dados">
             <label class="question-objetiva" required>Gênero</label>
-          <select id="select-genero" class="select select-outro" onclick="selectGenero()" name="genero">
-            <option value=""></option>
-            <option value="hcis">Homem cis</option>
-            <option value="htrans">Homem trans</option>
-            <option value="mcis">Mulber cis</option>
-            <option value="mtrans">Mulher trans</option>
-            <option>Outro</option>
-          </select>
-          <div id="generogestante"></div>
-          </div>
-          <div id="inputOculto-genero"> Qual(is)?
-            <input type="text" /></div>
+        <select id="select-genero" class="select select-outro" onclick="selectGenero()" name="genero">
+        <option value=""></option>
+        <option value="hcis">Homem cis</option>
+        <option value="htrans">Homem trans</option>
+        <option value="mcis">Mulher cis</option>
+        <option value="mtrans">Mulher trans</option>
+        <option>Outro</option>
+        </select>
+        <div id="generogestante"></div>
+        </div>
+        <div id="inputOculto-genero"> Qual(is)?
+        <input type="text" />
+</div>
 
         <div class="box-dados">
           <label class="question-objetiva" required>Idade</label>
@@ -410,9 +480,9 @@ if (isset($_POST['bairro'])) {
             <div class="inputs-rua">
                 <div class="input-radio">
                     <ul class="radio-list">
-                        <li><input type="radio" class="radio-input" value="sim1" id="field" name='radio'/> Sim 
+                        <li><input type="radio" class="radio-input" value="sim1" id="field" name='emrua'/> Sim 
                         </li>
-                        <li><input type="radio" class="radio-input" value="nao1" id="field" name='radio' /> Não</li>
+                        <li><input type="radio" class="radio-input" value="nao1" id="field" name='emrua' /> Não</li>
                         <label id="question-objetiva">Em caso de sim, qual o endereço?
                         </label>                           
                         <li><input type="text" class="input-text" id="field" /></li>
@@ -423,10 +493,10 @@ if (isset($_POST['bairro'])) {
         </div>
         </div>
         <label required>Número de crianças que residem na casa (usuário ou familiar): </label>
-        <div class="inputs-numbers--kids">
-        <input type="number" min="0" class="number-input" id="field"/> <p>Crianças de 0-5 anos</p>
-        <input type="number" min="0" class="number-input" id="field"/> <p>Crianças de 6-11 anos</p>
-        <input type="number" min="0" class="number-input" id="field"/> <p>Crianças de 12-17 anos</p>
+        <div class="inputs-numbers--kids" name="kidscasa">
+        <input type="number" min="0" class="number-input" id="field" /> <p>Crianças de 0-5 anos</p>
+        <input type="number" min="0" class="number-input" id="field" /> <p>Crianças de 6-11 anos</p>
+        <input type="number" min="0" class="number-input" id="field" /> <p>Crianças de 12-17 anos</p>
         </div>
 
         </section>
@@ -436,7 +506,7 @@ if (isset($_POST['bairro'])) {
             <div class="box-wrapper-subs">
                 <label class="question-objetiva" required>Qual(is) tipo(s) de substâncias psicoativas já fez uso na vida?</label>
                 <div class="checkbox-field">
-                    <ul>
+                    <ul name="subsusadas">
                         <li><input type="checkbox" id="field"> Álcool</li>
                         <li><input type="checkbox" id="field"> Tabaco, cigarro, vaping</li>
                         <li><input type="checkbox" id="field"> Crack(Mesclado, pitio, raspa)</li>
@@ -461,38 +531,38 @@ if (isset($_POST['bairro'])) {
                         <li>
                         </ul>
                         
-                        <ul>
+                        <ul name="subsusadas">
                         <input type="checkbox" id="field"> Outras(as) <strong>Quais?</strong> <input type="text" class="input-text" id="field"></li>
                         </ul>
                 </div>
 
                 <label class="question-objetiva" required>Qual é a primeira substância que você fez uso?</label>
-                <input type="text" class="input-text" id="field">
+                <input type="text" class="input-text" id="field" name="firstsub">
                 <label class="question-objetiva" required>Qual ou quais substâncias faz uso atualmente</label>
-                <input type="text" class="input-text" id="field">
+                <input type="text" class="input-text" id="field" name="subsemuso">
                 <label class="question-objetiva" required>Usa há quanto tempo?</label>
-                <input type="text" class="input-text" id="field">
+                <input type="text" class="input-text" id="field" name="timeuso">
                 <label class="question-objetiva" required>Quanto tempo após iniciar o uso procurou tratamento pela primeira vez?</label>
-                <input type="text" class="input-text" id="field">
+                <input type="text" class="input-text" id="field" name="timeposuso">
                 <label class="question-objetiva" required>Onde procurou ajuda/tratamento pela primeira vez?</label>
-                <input type="text" class="input-text" id="field">
+                <input type="text" class="input-text" id="field" name="ajudalocal">
 
                 <label class="question-objetiva" required>Qual ou quais órgãos/instituições que faz atendimento a usuários de álcool e/ou outras drogas você já foi atendido?</label>
                 <div class="checkbox-field">
-                    <ul><li><input type="checkbox" id="field"> CAPS AD</li>
+                    <ul name="orgaoatendimento"><li><input type="checkbox" id="field"> CAPS AD</li>
                         <li><input type="checkbox" id="field"> Unidade básica de saúde</li>
                         <li><input type="checkbox" id="field"> SHR AD</li>
                         <li><input type="checkbox" id="field"> Hospital Psiquiátrico</li>
                         <li><input type="checkbox" id="field"> Comunidade terapêutica</li>
                         </ul>
-                        <ul>
+                        <ul name="orgaoatendimento">
                         <li><input type="checkbox" id="field"> Instituições religiosas</li>
                         <li><input type="checkbox" id="field"> Atendimento Psicológico</li>
                         <li><input type="checkbox" id="field"> Atendimento Psiquiátrico</li>
                         <li><input type="checkbox" id="field"> Grupos de ajuda mutua</li>
                         <li><input type="checkbox" id="field"> Unidade de acolhimento</li>
                         </ul>
-                        <ul>
+                        <ul name="orgaoatendimento">
                             <li><input type="checkbox"> Outro(s)
                                 <strong>Qual(is)</strong>
                                 <input type="text" class="input-text" id="field"></li> 
@@ -500,7 +570,7 @@ if (isset($_POST['bairro'])) {
                 </div>
                 <label class="question-objetiva" required>Já pensou em suicídio alguma vez</label>
                 <div class="input-radio">
-                    <ul class="radio-list">
+                    <ul class="radio-list" name="pensarsuicidio">
                         <li><input type="radio" class="radio-input" value="sim" id="field" name='radio'/> Sim
                         </li>
                     <li><input type="radio" class="radio-input" value="nao" id="field" name='radio'/>
@@ -508,10 +578,10 @@ if (isset($_POST['bairro'])) {
                         <li><input type="radio"  class="radio-input" value="nao-responder" id="field" name='radio'/>
                             Prefiro não responder.</li>
                     </ul>
-                        <label for="question-objetiva" required>Por qual meio tentou suicidio?</label>
+                        <label for="question-objetiva" name="formasuicidio" required>Por qual meio tentou suicidio?</label>
                         <input type="text">
 
-                        <label for="">Há quanto tempo?</label>
+                        <label for="" name="timesuicidio">Há quanto tempo?</label>
                         <input type="text">
                     <div>
 
@@ -522,24 +592,24 @@ if (isset($_POST['bairro'])) {
 
                 <label class="question-objetiva" required>Qual é a expectativa do usuário e/ou da família em relação a esse atendimento?</label>
                 <div class="checkbox-field">
-                    <ul> <strong>Internação</strong>
+                    <ul name="expectativatratamento"> <strong>Internação</strong>
                         <li> <input type="checkbox" id="field"/> Internação voluntária</li>
                         <li><input type="checkbox" id="field"/> Internação involuntária</li>
                         <li><input type="checkbox" id="field"/> Internação compulsória</li>
                     </ul>
-                    <ul>
+                    <ul name="expectativatratamento">
                         <li> <input type="checkbox" id="field"/> Orientação</li>
                         <li> <input type="checkbox" id="field"/> Suporte Psicológico</li>
                         <li> <input type="checkbox" id="field"/> Tratamento na rede intersetorial álcool e drogas municipal</li>
                     </ul>
 
-                    <ul>
+                    <ul name="expectativatratamento">
                         <li> <input type="checkbox" id="field"/> Outra</li> <strong>Qual?(is)</strong> <input type="text" class="input-text" id="field">
 
                     </ul>
                 </div>
                 <label class="question-objetiva" required>Gostaria de atendimento presencial na CPDrogas?</label>
-                <ul class="radio-list">
+                <ul class="radio-list" name="atendimentopresencial">
                     <li><input type="radio" class="radio-input" value="sim" id="field" name='radio'/> Sim
                     </li>
                 <li><input type="radio"  class="radio-input" value="nao" id="field" name='radio'/> Não</li>
@@ -547,14 +617,14 @@ if (isset($_POST['bairro'])) {
                 </ul>
 
                 <h5 class="question-objetiva" required>Relato do atendimento</h5>
-                <input type="text" class="input-text" id="field">
+                <input type="text" class="input-text" id="field" name="relatoatendimento">
                 
                 <h5 class="question-objetiva">Encaminhamento</h5>
-                <input type="text" class="input-text" id="field">
+                <input type="text" class="input-text" id="field" name="encaminhamento">
 
-                <p class="question-objetiva">Fortaleza</p> <input type="datetime-local" class="input-text"/> 
+                <p class="question-objetiva">Fortaleza</p> <input type="datetime-local" class="input-text" name="datetimeatendimento"/> 
                 <!-- //substituir por função que pega data e hora;  -->
-                <p class="question-objetiva">Profissional responsável pelo acolhimento/encaminhamento</p> <input type="text" class="input-text" id="field">
+                <p class="question-objetiva">Profissional responsável pelo acolhimento/encaminhamento</p> <input type="text" class="input-text" id="field" name="profissionalatendimento">
 
                <div class="button">
                 <!-- Html de animação do button sucess -->

@@ -2,29 +2,23 @@
 
     if(isset($_POST['register'])) {
         // require('./config/db.php');
-        include("db.php");
+        include("/config/db.php");
         // $userName = $_POST["userName"];
         // $userEmail = $_POST["userEmail"];
         // $password = $_POST["password"];
-        $userName = filter_var($_POST["userName"], FILTER_SANITIZE_STRING);
-        $userEmail = filter_var($_POST["userEmail"], FILTER_SANITIZE_EMAIL);
-        $password = filter_var($_POST["password"], FILTER_SANITIZE_STRING);
+        $nomeusuario = filter_var($_POST["nomeusuario"], FILTER_SANITIZE_STRING);
+        $useremail = filter_var($_POST["useremail"], FILTER_SANITIZE_EMAIL);
+        $senha = filter_var($_POST["senha"], FILTER_SANITIZE_STRING);
         $passwordHashed = password_hash($password, PASSWORD_DEFAULT);
 
         $sql="INSERT into users(id, name, email, password, role) 
-            VALUES (?, '$userName', '$userEmail', '$password', '?')";
+            VALUES (?, '$nomeusuario', '$useremail', '$senha', '?')";
 
-            if(msqli_query($connection, $sql)) {
-                echo "Usuário cadastrado com sucesso";
-            } else {
-                echo "Erro".mysqli_connect_error($connection);
-            } 
-            mysqli_close($connection);
-
-        if(filter_var($userEmail, FILTER_VALIDATE_EMAIL)) {
-        $stmt = $pdo -> prepare('SELECT * from users WHERE email = ? ');
-        $stmt -> execute([$userEmail]);
-        $totalUsers = $stmt -> rowCount();
+            
+            if(filter_var($userEmail, FILTER_VALIDATE_EMAIL)) {
+            $stmt = $pdo -> prepare('SELECT * from users WHERE email = ? ');
+            $stmt -> execute([$userEmail]);
+            $totalUsers = $stmt -> rowCount();
 
         echo $totalUsers . '<br >';
 
@@ -42,6 +36,7 @@
     }
 ?>
 
+ 
 <?php require('./inc/header.html'); ?>
 
 <div class="container">
@@ -50,16 +45,16 @@
         <div class="card-header bg-light mb-3">Registre-se
             
         <div class="card-body">
-            <form action="login.php" method="POST">
+            <form action="/config/db.php" method="POST">
 
                 <div class="form-group">
-                    <label for="userName">Usuário</label>
-                    <input required type="text" name="userName" class="form-control" />
+                    <label for="nomeusuario">Usuário</label>
+                    <input required type="text" name="nomeusuario" class="form-control" />
                 </div>
 
                 <div class="form-group">
-                    <label for="userEmail">E-mail</label>
-                    <input required type="email" name="userEmail" class="form-control" />
+                    <label for="useremail">E-mail</label>
+                    <input required type="email" name="useremail" class="form-control" />
                     <br />
                     <?php if(isset($emailTaken)) { ?>
                         <p style="background-color: red"><?php echo $emailTaken ?></p>
@@ -68,7 +63,7 @@
 
                 <div class="form-group">
                     <label for="password">Senha</label>
-                    <input required type="password" name="password" class="form-control" />
+                    <input required type="password" name="senha" class="form-control" />
                 </div>
 
                 <button name="login" type="submit" class="bt btn-primary">Login</button>
