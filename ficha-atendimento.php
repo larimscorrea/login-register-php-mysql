@@ -1,12 +1,12 @@
 <?php
-    if(isset($_POST['ficha'])) {
-        require('.config/db.php'); 
+if (isset($_POST['ficha'])) {
+    require('.config/db.php');
 
-        $stmt = $pdo -> prepare('SELECT * from datas WHERE id = ? ');
+    $stmt = $pdo->prepare('SELECT * from datas WHERE id = ?');
 
-        $stmt->execute([$datas]);
-        $user = $stmt -> fetch();
-    }
+    $stmt->execute([$_POST['ficha']]);
+    $user = $stmt->fetch();
+}
 ?>
 
 <?php require('./inc/header.html'); ?>
@@ -20,25 +20,47 @@ print_r($rows);
 
 $client = null;
 
-if(isset($_POST['numberFicha'])) {
-    $fichaNumber = $_POST['$fichaNumber'];
+if (isset($_POST['numberFicha'])) {
+    $fichaNumber = $_POST['numberFicha'];
 } else {
-    echo "<p style='color: red' >Campo Nº da ficha não está definido.</p>";
-}
+    echo "<p style='color: red'>Campo Nº da ficha não está definido.</p>";
 
+
+    // Conexão com o banco de dados
+    try {
+    $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    } catch (PDOException $e) {
+    die("Erro de conexão com o banco de dados: " . $e->getMessage());
+    }
+
+    // Inserir dados no banco de dados
+    $query = 'INSERT INTO datas (ficha_number) VALUES (?)';
+    $stmt = $pdo->prepare($query);
+    $stmt->execute([$fichaNumber]);
+
+    // Verificar se a inserção foi bem-sucedida
+    if ($stmt->rowCount() > 0) {
+    echo "Dados inseridos no banco de dados.";
+    } else {
+    echo "Falha ao inserir dados no banco de dados.";
+    }
+
+}
 // Implementações próximas:
 // - Teste: verificar se o dado está ficando armazenado no banco de dados na tabela específica.
 
 //Implementação futura:
 //Sistema gerar um número de ficha baseado em um algoritmo criado para o próprio sistema.
 
-if(isset($_POST['cpfNumber'])) {
-    $cpfNumber = $_POST['cpfNumber']; 
+if (isset($_POST['cpfNumber'])) {
+    $cpfNumber = $_POST['cpfNumber'];
 
     //Validador de cpf
-    function testaCPF($strCPF) {
+    function testaCPF($strCPF)
+    {
         $soma = 0;
-    
+
         if ($strCPF == "00000000000") return false;
         if ($strCPF == "11111111111") return false;
         if ($strCPF == "22222222222") return false;
@@ -49,34 +71,33 @@ if(isset($_POST['cpfNumber'])) {
         if ($strCPF == "77777777777") return false;
         if ($strCPF == "88888888888") return false;
         if ($strCPF == "99999999999") return false;
-    
+
         for ($i = 1; $i <= 9; $i++) {
             $soma += intval(substr($strCPF, $i - 1, 1)) * (11 - $i);
         }
-    
+
         $resto = ($soma * 10) % 11;
         if ($resto == 10 || $resto == 11) $resto = 0;
-        if ($resto != intval(substr($strCPF, 10, 1))) return false;
-    
+        if ($resto != intval(substr($strCPF, 9, 1))) return false;
+
         $soma = 0;
         for ($i = 1; $i <= 10; $i++) {
             $soma += intval(substr($strCPF, $i - 1, 1)) * (12 - $i);
         }
-    
+
         $resto = ($soma * 10) % 11;
         if ($resto == 10 || $resto == 11) $resto = 0;
         if ($resto != intval(substr($strCPF, 10, 1))) return false;
-    
+
         return true;
     }
-    
+
     // Chamada da função para validar CPF
     if (testaCPF($cpfNumber)) {
         echo "<p style='color: green'> CPF válido</p>";
     } else {
         echo "<p style='color: red'> CPF inválido</p>";
     }
-    
 } else {
     echo "Campo CPF não está definido.";
 }
@@ -84,9 +105,7 @@ if(isset($_POST['cpfNumber'])) {
 // Implementações próximas:
 // - Teste: verificar se o dado está ficando armazenado no banco de dados na tabela específica.
 
-//Implementações futuras:
-// - O código verificar na busca na base de dados se o CPF digitado já possui ficha no sistema.
-
+//Implementações.
 ?>
 
 <?php
@@ -159,9 +178,10 @@ function possivelGestante($genero, $gestante) {
 possivelGestante($genero, $gestante);
 ?>
 
-<?php
 
+<?php
 $locais = array(
+    "nãodefinido" => "Bairro ainda não selecionado",
     "aerolandia" => "Regional 6 e território 26",
     "aeroporto" => "Regional 4 e território 18",
     "aldeota" => "Regional 2 e território 7",
@@ -262,13 +282,15 @@ $locais = array(
     "vilarodrigues" => "Regional 3 e território 13"
 );
 
-$bairro = '';
+$bairro = 'naodefinido';
 if (isset($locais[$bairro])) {
-    echo "O bairro $bairro está localizado na " . $locais[$bairro];
+    echo "O bairro $bairro está localizado na região " . $locais[$bairro];
 } else {
     echo "Não há informações disponíveis para o bairro $bairro.";
 };
 ?>
+
+<!-- Não entendi código abaixo -->
 <label for="bairro">Selecione um bairro:</label>
     <select name="bairro" id="bairro">
         <option value="">Selecione</option>
@@ -285,6 +307,252 @@ if (isset($_POST['bairro'])) {
     echo "<p>Local: $local</p>";
 }
 ?>
+<!-- Não entendi código acima -->
+
+<!-- Situação de rua -->
+
+<?php
+function emRua() {
+    if($_SERVER['REQUEST_METHOD'] == 'POST') {
+        if(isset($_POST['emrua'])) {
+            $opcao = $_POST['emrua']; // obter o valor do input de rádio 'emrua'
+            if($opcao == 'sim1') {
+                // ação a ser executada quando a opção 'Sim' for selecionada
+                if(isset($_POST['endereco'])) {
+                    $endereco = $_POST['endereco']; // obter o valor do campo de texto 'endereco'
+                    // realizar alguma lógica com o endereço
+                    echo "Endereço em situação de rua: " . $endereco;
+                }
+            } elseif($opcao == 'nao1') {
+                // ação a ser executada quando a opção 'Não' for selecionada
+                echo "Não está em situação de rua.";
+            }
+        }
+    }
+}
+?>
+<!-- Situação de rua -->
+
+<!-- Quantidades de crianças -->
+
+<?php 
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    if (isset($_POST['kidscasa'])) {
+        $criancas_0_5_anos = $_POST['kidscasa'][0];
+        $criancas_6_11_anos = $_POST['kidscasa'][1];
+        $criancas_12_17_anos = $_POST['kidscasa'][2];
+        
+        // Preparar e executar a consulta SQL de inserção
+        $sql = "INSERT INTO tabela (criancas_0_5, criancas_6_11, criancas_12_17) VALUES ('$criancas_0_5_anos', '$criancas_6_11_anos', '$criancas_12_17_anos')";
+        if ($conn->query($sql) === TRUE) {
+            echo "Dados inseridos com sucesso.";
+        } else {
+            echo "Erro ao inserir dados: " . $conn-> error;
+        }
+    }
+}
+
+?>
+
+<?php
+// Substancias utilizadas: 
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    if (isset($_POST['subsusadas'])) {
+        $substancias = $_POST['subsusadas'];
+        
+        // Transforma o array de substâncias em uma string separada por vírgulas
+        $substanciasString = implode(', ', $substancias);
+        
+        // Preparar e executar a consulta SQL de inserção
+        $sql = "INSERT INTO tabela (substancias_psicoativas) VALUES ('$substanciasString')";
+        if ($conn->query($sql) === TRUE) {
+            echo "Dados inseridos com sucesso.";
+        } else {
+            echo "Erro ao inserir dados: " . $conn->error;
+        }
+    }
+}
+
+// Substancias utilizadas: 
+
+?> 
+
+<?php 
+
+// Perguntas objetivas: 
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $firstSubstance = $_POST['firstsub'];
+    $substancesInUse = $_POST['subsemuso'];
+    $timeOfUse = $_POST['timeuso'];
+    $timeAfterUseForTreatment = $_POST['timeposuso'];
+    $helpLocation = $_POST['ajudalocal'];
+    
+    // Preparar e executar a consulta SQL de inserção
+    $sql = "INSERT INTO tabela (primeira_substancia, substancias_em_uso, tempo_de_uso, tempo_ate_tratamento, local_de_ajuda) 
+            VALUES ('$firstSubstance', '$substancesInUse', '$timeOfUse', '$timeAfterUseForTreatment', '$helpLocation')";
+    if ($conn->query($sql) === TRUE) {
+        echo "Dados inseridos com sucesso.";
+    } else {
+        echo "Erro ao inserir dados: " . $conn->error;
+    }
+}
+?>
+
+<?php 
+// Órgãos de atendimento:
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    if (isset($_POST['orgaoatendimento'])) {
+        $atendimentoOrgaos = $_POST['orgaoatendimento'];
+        $atendimentoOrgaos = implode(', ', $atendimentoOrgaos);
+    } else {
+        $atendimentoOrgaos = "";
+    }
+    
+    // Preparar e executar a consulta SQL de inserção
+    $sql = "INSERT INTO tabela (orgaos_atendimento) VALUES ('$atendimentoOrgaos')";
+    if ($conn->query($sql) === TRUE) {
+        echo "Dados inseridos com sucesso.";
+    } else {
+        echo "Erro ao inserir dados: " . $conn->error;
+    }
+}
+?>
+
+<?php 
+// Suicidio 
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    if (isset($_POST['pensarsuicidio'])) {
+        $pensarSuicidio = $_POST['pensarsuicidio'];
+    } else {
+        $pensarSuicidio = "";
+    }
+
+    if ($pensarSuicidio === 'sim') {
+        if (isset($_POST['formasuicidio'])) {
+            $formaSuicidio = $_POST['formasuicidio'];
+        } else {
+            $formaSuicidio = "";
+        }
+
+        if (isset($_POST['timesuicidio'])) {
+            $tempoSuicidio = $_POST['timesuicidio'];
+        } else {
+            $tempoSuicidio = "";
+        }
+    } else {
+        $formaSuicidio = "";
+        $tempoSuicidio = "";
+    }
+
+    // Preparar e executar a consulta SQL de inserção
+    $sql = "INSERT INTO tabela (pensar_suicidio, forma_suicidio, tempo_suicidio) VALUES ('$pensarSuicidio', '$formaSuicidio', '$tempoSuicidio')";
+    if ($conn->query($sql) === TRUE) {
+        echo "Dados inseridos com sucesso.";
+    } else {
+        echo "Erro ao inserir dados: " . $conn->error;
+    }
+}
+?>
+
+<?php 
+// Expectativa tratamento
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    if (isset($_POST['expectativatratamento'])) {
+        $expectativaTratamento = $_POST['expectativatratamento'];
+    } else {
+        $expectativaTratamento = array();
+    }
+
+    // Converter o array de expectativas em uma string separada por vírgulas
+    $expectativaTratamentoString = implode(", ", $expectativaTratamento);
+
+    // Preparar e executar a consulta SQL de inserção
+    $sql = "INSERT INTO tabela (expectativa_tratamento) VALUES ('$expectativaTratamentoString')";
+    if ($conn->query($sql) === TRUE) {
+        echo "Dados inseridos com sucesso.";
+    } else {
+        echo "Erro ao inserir dados: " . $conn->error;
+    }
+}
+?>
+
+<?php
+
+// Atendimento presencial
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    if (isset($_POST['atendimentopresencial'])) {
+        $atendimentoPresencial = $_POST['atendimentopresencial'];
+    } else {
+        $atendimentoPresencial = '';
+    }
+
+    // Preparar e executar a consulta SQL de inserção
+    $sql = "INSERT INTO tabela (atendimento_presencial) VALUES ('$atendimentoPresencial')";
+    if ($conn->query($sql) === TRUE) {
+        echo "Dados inseridos com sucesso.";
+    } else {
+        echo "Erro ao inserir dados: " . $conn->error;
+    }
+}
+?>
+
+<?php
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    // Capturar os valores fornecidos pelo usuário
+    $relatoAtendimento = isset($_POST['relatoatendimento']) ? $_POST['relatoatendimento'] : '';
+    $encaminhamento = isset($_POST['encaminhamento']) ? $_POST['encaminhamento'] : '';
+    $dataHoraAtendimento = isset($_POST['datetimeatendimento']) ? $_POST['datetimeatendimento'] : '';
+    $profissionalAtendimento = isset($_POST['profissionalatendimento']) ? $_POST['profissionalatendimento'] : '';
+
+    // Preparar e executar a consulta SQL de inserção
+    $sql = "INSERT INTO tabela (relato_atendimento, encaminhamento, data_hora_atendimento, profissional_atendimento) 
+            VALUES ('$relatoAtendimento', '$encaminhamento', '$dataHoraAtendimento', '$profissionalAtendimento')";
+    if ($conn->query($sql) === TRUE) {
+        echo "Dados inseridos com sucesso.";
+    } else {
+        echo "Erro ao inserir dados: " . $conn->error;
+    }
+}
+?>
+
+<?php
+// Botões
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Aqui você pode adicionar o código que processa os dados do formulário
+    // por exemplo, salvar os dados em um banco de dados
+
+    // Exemplo: salvar os dados em um banco de dados
+    $nome = $_POST['nome'];
+    $email = $_POST['email'];
+
+    // Código para salvar os dados no banco de dados
+
+    // Redirecionar para uma página de sucesso
+    header('Location: sucesso.php');
+    exit;
+}
+
+if (isset($_POST['remove'])) {
+    // Aqui você pode adicionar o código que remove os dados do formulário
+    // por exemplo, limpar as variáveis de sessão ou reiniciar as variáveis
+
+    // Exemplo: limpar as variáveis de sessão
+    session_start();
+    session_unset();
+    session_destroy();
+
+    // Redirecionar para a mesma página (ou outra página)
+    header('Location: index.php');
+    exit;
+}
+?>
+<?php require('./inc/header.html'); ?>
+
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -294,34 +562,35 @@ if (isset($_POST['bairro'])) {
     <title>Document</title>
 </head>
 <body>
-<form action="">
-                <main>
-                <h1>Ficha de Acolhimento Individual</h1>
-                    <div class="box-dados-iniciais">
-                        <div class="dados-iniciais">
-                            <label for="input-inicial" class="question-objetiva">Nº da ficha:</label>
-                             <input class="input-text" id="field"/>
-                         </div>
-                         <div class="dados-iniciais">
-                             <label for="input-inicial" class="question-objetiva">CPF:</label>
-                             <input class="input-text input-cpf" id="field"/>
-                         </div>
-                    </div>
-
-                </main>
+    <form action="">
+        <main>
+            <h1>Ficha de Acolhimento Individual</h1>
+            <div class="box-dados-iniciais">
+                <div class="dados-iniciais">
+                    <label for="input-inicial" class="question-objetiva">Nº da ficha:</label>
+                    <input class="input-text" id="field" />
+                </div>
+                <div class="dados-iniciais">
+                    <label for="input-inicial" class="question-objetiva">CPF:</label>
+                    <input class="input-text input-cpf" id="field" />
+                </div>
+            </div>
+        </main>
         
         <section class="parte-um">
             <label class="question-objetiva">Qual é o tipo de atendimento realizado?</label>
             <select id="field" name="select-atendimento" class="select mySelect" required>
                 <option></option>
-                <option>Teleatendimento psicossocial via SISGEP</option> 
+                <option>Teleatendimento psicossocial via SISGEP</option>
                 <option>Teleatendimento psicossocial realizado via demanda espontânea</option>
                 <option>Teleatendimento psicossocial presencial realizado externamente</option>
                 <option>Outro tipo de atendimento realizado</option>
-              </select>
-              <div id="inputOculto"> Nº do protocolo do atendimento SISGEP:
+            </select>
+            <div id="inputOculto">
+                Nº do protocolo do atendimento SISGEP:
                 <input type="text" class="input-text" />
-              </div>
+            </div>
+            
             <label class="question-objetiva" required>Quem procurou ajuda/tratamento?</label>
             <select id="field" class="select select-ajuda">
                 <option></option>
@@ -333,309 +602,204 @@ if (isset($_POST['bairro'])) {
                 <option>Técnicos de instituições</option>
                 <option>Outras pessoas</option>
             </select>
-            <div id="inputOcultoAjuda" required> Qual(is) outras pessoas procuraram ajuda/tratamento?
-              <input type="text" class="input-text" />
+            <div id="inputOcultoAjuda" required>
+                Qual(is) outras pessoas procuraram ajuda/tratamento?
+                <input type="text" class="input-text" />
             </div>
-                <div class="box-conhecimento">
+            
+            <div class="box-conhecimento">
                 <label class="question-objetiva" required>Como ficou sabendo do serviço?</label>
-                <input type="text" class="input-text" id="field" >
-                </div>  
-                
+                <input type="text" class="input-text" id="field" />
+            </div>  
         </section>
+        
         <section class="parte-dois">
             <h3>Dados Sociodemográficos</h3>
-          <div class="box-dados-iniciais">
+            <div class="box-dados-iniciais">
+                <div class="box-dados">
+                    <label class="question-objetiva" required>Gênero</label>
+                    <select id="select-genero" class="select select-outro" onclick="selectGenero()" name="genero">
+                        <option value=""></option>
+                        <option value="hcis">Homem cis</option>
+                        <option value="htrans">Homem trans</option>
+                        <option value="mulhercis">Mulher cis</option>
+                        <option value="mulhertrans">Mulher trans</option>
+                        <option value="outrogenero">Outro</option>
+                    </select>
+                </div>
+                
+                <div class="box-dados">
+                    <label class="question-objetiva" required>Idade</label>
+                    <input type="number" class="input-number" min="0" max="150" id="field" name="idade" required />
+                </div>
+            </div>
+            
+            <label class="question-objetiva" required>Estado civil</label>
+            <select id="field" class="select select-outro" onclick="selectEstadoCivil()" name="estadocivil" required>
+                <option value=""></option>
+                <option value="solteiro">Solteiro</option>
+                <option value="casado">Casado</option>
+                <option value="divorciado">Divorciado</option>
+                <option value="viuvo">Viúvo</option>
+                <option value="outroestadocivil">Outro</option>
+            </select>
+            
+            <div id="inputOcultoEstadoCivil">
+                Qual(is) outro(s) estado(s) civil(is)?
+                <input type="text" class="input-text" />
+            </div>
+            
+            <label class="question-objetiva" required>Escolaridade</label>
+            <select id="field" class="select select-outro" onclick="selectEscolaridade()" name="escolaridade" required>
+                <option value=""></option>
+                <option value="fundamentalincompleto">Fundamental incompleto</option>
+                <option value="fundamentalcompleto">Fundamental completo</option>
+                <option value="medioincompleto">Médio incompleto</option>
+                <option value="mediocompleto">Médio completo</option>
+                <option value="superiorincompleto">Superior incompleto</option>
+                <option value="superiorcompleto">Superior completo</option>
+                <option value="posgraduacao">Pós-graduação</option>
+                <option value="outroescolaridade">Outro</option>
+            </select>
+            
+            <div id="inputOcultoEscolaridade">
+                Qual(is) outro(s) nível(is) de escolaridade?
+                <input type="text" class="input-text" />
+            </div>
+            
             <div class="box-dados">
-            <label class="question-objetiva" required>Gênero</label>
-        <select id="select-genero" class="select select-outro" onclick="selectGenero()" name="genero">
-        <option value=""></option>
-        <option value="hcis">Homem cis</option>
-        <option value="htrans">Homem trans</option>
-        <option value="mcis">Mulher cis</option>
-        <option value="mtrans">Mulher trans</option>
-        <option>Outro</option>
-        </select>
-        <div id="generogestante"></div>
-        </div>
-        <div id="inputOculto-genero"> Qual(is)?
-        <input type="text" />
-</div>
-
-        <div class="box-dados">
-          <label class="question-objetiva" required>Idade</label>
-          <input type="number" min="0" class="number-input" id="field"/> 
-      </div>
-          </div>
-        <!-- Value pode ser a resposta para a distinção entre as opções do select -->
-        </div>
-       </div>
-        <div class="box-local">
-            <div class="box-bairro">
-                <p class="questoes-3">Bairro:</p>
-                <select class="select select-bairro" name="select" id="select-bairro" required> 
-                  <option value=""></option>
-                  <option value="aerolandia">Aerolândia</option>
-                  <option value="aeroporto">Aeroporto</option>
-                  <option value="aldeota">Aldeota</option>
-                  <option value="altodabalanca">Alto da Balança</option>
-                  <option value="alvaroweyne">Álvaro Weyne</option>
-                  <option value="amadeufurtado">Amadeu Furtado</option>
-                  <option value="antoniobezerra">Antônio Bezerra</option>
-                  <option value="barradoceara">Barra do Ceará</option>
-                  <option value="belavista">Bela Vista</option>
-                  <option value="benfica">Benfica</option>
-                  <option value="bomfuturo">Bom Futuro</option>
-                  <option value="boavista">Boa Vista</option>
-                  <option value="bomjardim">Bom Jardim</option>
-                  <option value="bonsucesso">Bonsucesso</option>
-                  <option value="caisdoporto">Cais do Porto</option>
-                  <option value="cajazeiras">Cajazeiras</option>
-                  <option value="cambeba">Cambeba</option>
-                  <option value="carlitopamplona">Carlito Pamplona</option>
-                  <option value="centro">Centro</option>
-                  <option value="cidade2">Cidade 2000 </option>
-                  <option value="cidadedosf">Cidade dos Funcionários</option>
-                  <option value="coac">Coaçu</option>
-                  <option value="coco">Cocó</option>
-                  <option value="conjuntoceara1">Conjunto Ceará</option>
-                  <option value="conjuntoceara2">Conjunto Palmeiras</option>
-                  <option value="cristoredentor">Cristo Redentor</option>
-                  <option value="curio">Curió</option>
-                  <option value="damas">Damas</option>
-                  <option value="delourdes">De Lourdes</option>
-                  <option value="democritorocha">Demócrito Rocha</option>
-                  <option value="dende">Dendê</option>
-                  <option value="dionisiotorres">Dionísio Torres</option>
-                  <option value="domlustosa">Dom Lustosa</option>
-                  <option value="dunas">Dunas</option>
-                  <option value="edsonqueiroz">Edson Queiroz</option>
-                  <option value="fariasbrito">Farias Brito</option>
-                  <option value="floresta">Floresta</option>
-                  <option value="genibau">Genibaú</option>
-                  <option value="guajeru">Guajeru</option>
-                  <option value="granjaportugal">Granja Portugal</option>
-                  <option value="granjalisboa">Granja Lisboa</option>
-                  <option value="henriquejorge">Henrique Jorge</option>
-                  <option value="itaoca">Itaoca</option>
-                  <option value="itaperi">Itaperi</option>
-                  <option value="jacarecanga">Jacarecanga</option>
-                  <option value="jardimamerica">Jardim América</option>
-                  <option value="jardimguanabara">Jardim Guanabara</option>
-                  <option value="jardimdasoliveiras">Jardim das Oliveiras</option>
-                  <option value="jardimiracema">Jardim Iracema</option>
-                  <option value="joaquimtavora">Joaquim Távora</option>
-                  <option value="josebonifacio">José Bonifácio</option>
-                  <option value="josedealencar">José de Alencar</option>
-                  <option value="lagoaredonda">Lagoa Redonda</option>
-                  <option value="maraponga">Maraponga</option>
-                  <option value="meireles">Meireles</option>
-                  <option value="messejana">Messejana</option>
-                  <option value="montese">Montese</option>
-                  <option value="mondubim">Mondubim</option>
-                  <option value="montecastelo">Monte Castelo</option>
-                  <option value="mourabrasil">Moura Brasil</option>
-                  <option value="mucuripe">Mucuripe</option>
-                  <option value="otaviobonfim">Otávio Bonfim </option>
-                  <option value="olavooliveira">Olavo Oliveira</option>
-                  <option value="padreandrade">Padre Andrade</option>
-                  <option value="papicu">Papicu</option>
-                  <option value="paupina">Paupina</option>
-                  <option value="parangaba">Parangaba</option>
-                  <option value="parreao">Parreão</option>
-                  <option value="parquearaxa">Parque Araxá</option>
-                  <option value="parqueiracema">Parque Iracema</option>
-                  <option value="parquelandia">Parquelândia</option>
-                  <option value="parquemanibura">Parque Manibura</option>
-                  <option value="parquesantamaria">Parque Santa Maria</option>
-                  <option value="parquesaojose">Parque São José</option>
-                  <option value="passare">Passaré</option>
-                  <option value="pedras">Pedras</option>
-                  <option value="pici">Pici</option>
-                  <option value="pirambu">Pirambu</option>       
-                  <option value="praiadeiracema">Praia de Iracema</option>
-                  <option value="praiadofuturoi">Praia do Futuro I</option>
-                  <option value="praiadofuturoii">Praia do Futuro II</option>
-                  <option value="prefeitojosewalter">Prefeito José Walter</option>
-                  <option value="presidentekennedy">Presidente Kennedy</option>
-                  <option value="quintinocunha">Quintino Cunha</option>
-                  <option value="rodolfoteofilo">Rodolfo Teófilo</option>
-                  <option value="sabiguaba">Sabiguaba</option>
-                  <option value="salinas">Salinas</option>
-                  <option value="saobento">São Bento</option>
-                  <option value="saogerardo">São Gerardo</option>
-                  <option value="saojoaodotauape">São João do Tauape</option>
-                  <option value="serrinha">Serrinha</option>
-                  <option value="siqueira">Siqueira</option>
-                  <option value="varjota">Varjota</option>
-                  <option value="vicentepizon">Vicente Pizón</option>
-                  <option value="vilaellery">Vila Ellery</option>
-                  <option value="vilaperi">Vila Peri</option>
-                  <option value="vilavelha">Vila Velha</option>
-                  <option value="vilauniao">Vila União</option>
-              </select>
-              <div id="local"></div>
+                <label class="question-objetiva">Ocupação</label>
+                <input type="text" class="input-text" id="field" name="ocupacao" />
             </div>
-        <div class="box-rua" required>
-            <label>Em situação de rua: </label>
-            <div class="inputs-rua">
-                <div class="input-radio">
-                    <ul class="radio-list">
-                        <li><input type="radio" class="radio-input" value="sim1" id="field" name='emrua'/> Sim 
-                        </li>
-                        <li><input type="radio" class="radio-input" value="nao1" id="field" name='emrua' /> Não</li>
-                        <label id="question-objetiva">Em caso de sim, qual o endereço?
-                        </label>                           
-                        <li><input type="text" class="input-text" id="field" /></li>
-                    </ul>
-                </div>
-                
+            
+            <label required>Número de crianças que residem na casa (usuário ou familiar): </label>
+            <div class="inputs-numbers--kids" name="kidscasa">
+                <input type="number" min="0" class="number-input" id="field" /> <p>Crianças de 0-5 anos</p>
+                <input type="number" min="0" class="number-input" id="field" /> <p>Crianças de 6-11 anos</p>
+                <input type="number" min="0" class="number-input" id="field" /> <p>Crianças de 12-17 anos</p>
             </div>
-        </div>
-        </div>
-        <label required>Número de crianças que residem na casa (usuário ou familiar): </label>
-        <div class="inputs-numbers--kids" name="kidscasa">
-        <input type="number" min="0" class="number-input" id="field" /> <p>Crianças de 0-5 anos</p>
-        <input type="number" min="0" class="number-input" id="field" /> <p>Crianças de 6-11 anos</p>
-        <input type="number" min="0" class="number-input" id="field" /> <p>Crianças de 12-17 anos</p>
-        </div>
-
         </section>
-
-        <section class="parte-tres">
-            <h3>Dados de Atenção e Cuidado </h3>
-            <div class="box-wrapper-subs">
-                <label class="question-objetiva" required>Qual(is) tipo(s) de substâncias psicoativas já fez uso na vida?</label>
-                <div class="checkbox-field">
-                    <ul name="subsusadas">
-                        <li><input type="checkbox" id="field"> Álcool</li>
-                        <li><input type="checkbox" id="field"> Tabaco, cigarro, vaping</li>
-                        <li><input type="checkbox" id="field"> Crack(Mesclado, pitio, raspa)</li>
-                        <li><input type="checkbox" id="field"> Maconha(Shank, haxixe, k2)</li>
-                        <li><input type="checkbox" id="field"> Cocaína(Merla, oxi...)</li>
-                        </ul>
-                        
-                        <ul>
-                        <li><input type="checkbox" id="field"> Solventes(Cola, loló, lança perfume, anti-respingo de solda)</li> 
-                        <li><input type="checkbox" id="field"> Tranquilizantes(Diazepam, rivotril, ripinol...)</li>
-                        <li><input type="checkbox" id="field"> Anestésicos(Boa noite cinderela, ketamina)</li>
-                        <li><input type="checkbox" id="field"> Alucinógenos sintéticos(LSD, Doce, DMT, aranha)</li> 
-                        <li><input type="checkbox" id="field"> Alucinógenos naturais(Cogumelo, zabumba, Ahayuaska, Sto Daime, Ibogaína)</li>
-                        </ul>
         
-                        <ul>
-                        <li><input type="checkbox" id="field"> Anfetaminas(Rebite, speed, ritalina)</li>
-                        <li><input type="checkbox" id="field"> Opióides(Remédios para dor, morfina, metadona, tramal)</li>
-                        <li><input type="checkbox" id="field"> Ecstasy(Bala, MDMA, MD, Mandy)</li>
-                        <li><input type="checkbox" id="field"> Heroína</li>
-                        <li><input type="checkbox" id="field"> Não sabe/Não respondeu</li>
-                        <li>
-                        </ul>
-                        
-                        <ul name="subsusadas">
-                        <input type="checkbox" id="field"> Outras(as) <strong>Quais?</strong> <input type="text" class="input-text" id="field"></li>
-                        </ul>
-                </div>
-
-                <label class="question-objetiva" required>Qual é a primeira substância que você fez uso?</label>
-                <input type="text" class="input-text" id="field" name="firstsub">
-                <label class="question-objetiva" required>Qual ou quais substâncias faz uso atualmente</label>
-                <input type="text" class="input-text" id="field" name="subsemuso">
-                <label class="question-objetiva" required>Usa há quanto tempo?</label>
-                <input type="text" class="input-text" id="field" name="timeuso">
-                <label class="question-objetiva" required>Quanto tempo após iniciar o uso procurou tratamento pela primeira vez?</label>
-                <input type="text" class="input-text" id="field" name="timeposuso">
-                <label class="question-objetiva" required>Onde procurou ajuda/tratamento pela primeira vez?</label>
-                <input type="text" class="input-text" id="field" name="ajudalocal">
-
-                <label class="question-objetiva" required>Qual ou quais órgãos/instituições que faz atendimento a usuários de álcool e/ou outras drogas você já foi atendido?</label>
-                <div class="checkbox-field">
-                    <ul name="orgaoatendimento"><li><input type="checkbox" id="field"> CAPS AD</li>
-                        <li><input type="checkbox" id="field"> Unidade básica de saúde</li>
-                        <li><input type="checkbox" id="field"> SHR AD</li>
-                        <li><input type="checkbox" id="field"> Hospital Psiquiátrico</li>
-                        <li><input type="checkbox" id="field"> Comunidade terapêutica</li>
-                        </ul>
-                        <ul name="orgaoatendimento">
-                        <li><input type="checkbox" id="field"> Instituições religiosas</li>
-                        <li><input type="checkbox" id="field"> Atendimento Psicológico</li>
-                        <li><input type="checkbox" id="field"> Atendimento Psiquiátrico</li>
-                        <li><input type="checkbox" id="field"> Grupos de ajuda mutua</li>
-                        <li><input type="checkbox" id="field"> Unidade de acolhimento</li>
-                        </ul>
-                        <ul name="orgaoatendimento">
-                            <li><input type="checkbox"> Outro(s)
-                                <strong>Qual(is)</strong>
-                                <input type="text" class="input-text" id="field"></li> 
-                        </ul>
-                </div>
-                <label class="question-objetiva" required>Já pensou em suicídio alguma vez</label>
-                <div class="input-radio">
-                    <ul class="radio-list" name="pensarsuicidio">
-                        <li><input type="radio" class="radio-input" value="sim" id="field" name='radio'/> Sim
-                        </li>
-                    <li><input type="radio" class="radio-input" value="nao" id="field" name='radio'/>
-                        Não</li>
-                        <li><input type="radio"  class="radio-input" value="nao-responder" id="field" name='radio'/>
-                            Prefiro não responder.</li>
-                    </ul>
-                        <label for="question-objetiva" name="formasuicidio" required>Por qual meio tentou suicidio?</label>
-                        <input type="text">
-
-                        <label for="" name="timesuicidio">Há quanto tempo?</label>
-                        <input type="text">
-                    <div>
-
-</div>
+        <section class="parte-tres">
+            <h3>Caracterização do Usuário e da Situação Problema</h3>
+            <div class="box-dados-iniciais">
+                <div class="box-dados">
+                    <label class="question-objetiva" required>Usa álcool?</label>
+                    <select id="field" class="select select-outro" onclick="selectAlcool()" name="alcool" required>
+                        <option value=""></option>
+                        <option value="sim">Sim</option>
+                        <option value="nao">Não</option>
+                        <option value="naosabe">Não sabe</option>
+                    </select>
                 </div>
                 
-
-
-                <label class="question-objetiva" required>Qual é a expectativa do usuário e/ou da família em relação a esse atendimento?</label>
-                <div class="checkbox-field">
-                    <ul name="expectativatratamento"> <strong>Internação</strong>
-                        <li> <input type="checkbox" id="field"/> Internação voluntária</li>
-                        <li><input type="checkbox" id="field"/> Internação involuntária</li>
-                        <li><input type="checkbox" id="field"/> Internação compulsória</li>
-                    </ul>
-                    <ul name="expectativatratamento">
-                        <li> <input type="checkbox" id="field"/> Orientação</li>
-                        <li> <input type="checkbox" id="field"/> Suporte Psicológico</li>
-                        <li> <input type="checkbox" id="field"/> Tratamento na rede intersetorial álcool e drogas municipal</li>
-                    </ul>
-
-                    <ul name="expectativatratamento">
-                        <li> <input type="checkbox" id="field"/> Outra</li> <strong>Qual?(is)</strong> <input type="text" class="input-text" id="field">
-
-                    </ul>
+                <div id="inputOcultoAlcool" required>
+                    Há quanto tempo faz uso de álcool?
+                    <input type="text" class="input-text" />
                 </div>
-                <label class="question-objetiva" required>Gostaria de atendimento presencial na CPDrogas?</label>
-                <ul class="radio-list" name="atendimentopresencial">
-                    <li><input type="radio" class="radio-input" value="sim" id="field" name='radio'/> Sim
-                    </li>
-                <li><input type="radio"  class="radio-input" value="nao" id="field" name='radio'/> Não</li>
+            </div>
+            
+            <div class="box-dados-iniciais">
+                <div class="box-dados">
+                    <label class="question-objetiva" required>Usa drogas?</label>
+                    <select id="field" class="select select-outro" onclick="selectDrogas()" name="drogas" required>
+                        <option value=""></option>
+                        <option value="sim">Sim</option>
+                        <option value="nao">Não</option>
+                        <option value="naosabe">Não sabe</option>
+                    </select>
+                </div>
                 
-                </ul>
-
-                <h5 class="question-objetiva" required>Relato do atendimento</h5>
-                <input type="text" class="input-text" id="field" name="relatoatendimento">
+                <div id="inputOcultoDrogas" required>
+                    Quais drogas utiliza?
+                    <input type="text" class="input-text" />
+                </div>
+            </div>
+            
+            <div class="box-dados-iniciais">
+                <div class="box-dados">
+                    <label class="question-objetiva" required>Problema de saúde</label>
+                    <select id="field" class="select select-outro" onclick="selectSaude()" name="saude" required>
+                        <option value=""></option>
+                        <option value="sim">Sim</option>
+                        <option value="nao">Não</option>
+                        <option value="naosabe">Não sabe</option>
+                    </select>
+                </div>
                 
-                <h5 class="question-objetiva">Encaminhamento</h5>
-                <input type="text" class="input-text" id="field" name="encaminhamento">
-
-                <p class="question-objetiva">Fortaleza</p> <input type="datetime-local" class="input-text" name="datetimeatendimento"/> 
-                <!-- //substituir por função que pega data e hora;  -->
-                <p class="question-objetiva">Profissional responsável pelo acolhimento/encaminhamento</p> <input type="text" class="input-text" id="field" name="profissionalatendimento">
-
-               <div class="button">
-                <!-- Html de animação do button sucess -->
-                <div class="buttons">
-
-                <button class="button-sucess">Enviar ficha de atendimento</button>
-                <button class="button-remove" onclick="myRemove()">Remover dados da ficha de atendimento</button>
-
-               </div>
+                <div id="inputOcultoSaude" required>
+                    Qual é o problema de saúde?
+                    <input type="text" class="input-text" />
+                </div>
+            </div>
+            
+            <div class="box-dados-iniciais">
+                <div class="box-dados">
+                    <label class="question-objetiva" required>Problema de saúde mental</label>
+                    <select id="field" class="select select-outro" onclick="selectSaudeMental()" name="saudemental" required>
+                        <option value=""></option>
+                        <option value="sim">Sim</option>
+                        <option value="nao">Não</option>
+                        <option value="naosabe">Não sabe</option>
+                    </select>
+                </div>
+                
+                <div id="inputOcultoSaudeMental" required>
+                    Qual é o problema de saúde mental?
+                    <input type="text" class="input-text" />
+                </div>
+            </div>
+            
+            <label class="question-objetiva">Qual é a situação problema?</label>
+            <textarea id="field" class="textarea" required></textarea>
+            
+            <label class="question-objetiva">Quanto tempo o problema perdura?</label>
+            <input type="text" class="input-text" id="field" required />
+            
+            <div class="box-dados">
+                <label class="question-objetiva">O problema já ocorreu anteriormente?</label>
+                <select id="field" class="select select-outro" onclick="selectProblemaAnterior()" name="problemaanterior">
+                    <option value=""></option>
+                    <option value="sim">Sim</option>
+                    <option value="nao">Não</option>
+                    <option value="naosabe">Não sabe</option>
+                </select>
+            </div>
+            
+            <div id="inputOcultoProblemaAnterior">
+                Qual é o histórico do problema?
+                <input type="text" class="input-text" />
             </div>
         </section>
-
+        
+        <section class="parte-quatro">
+            <h3>Encaminhamentos</h3>
+            <div class="box-dados">
+                <label class="question-objetiva">Encaminhado para:</label>
+                <select id="field" class="select select-outro" onclick="selectEncaminhado()" name="encaminhado">
+                    <option value=""></option>
+                    <option value="servicosocial">Serviço Social</option>
+                    <option value="psicologia">Psicologia</option>
+                    <option value="psiquiatria">Psiquiatria</option>
+                    <option value="nutricao">Nutrição</option>
+                    <option value="terapiaocupacional">Terapia Ocupacional</option>
+                    <option value="outroencaminhamento">Outro</option>
+                </select>
+            </div>
+            
+            <div id="inputOcultoEncaminhado">
+                Qual(is) outro(s) encaminhamento(s)?
+                <input type="text" class="input-text" />
+            </div>
+            
+            <label class="question-objetiva">Data do encaminhamento:</label>
+            <input type="date" class="input-date" id="field" name="dataencaminhamento" />
+            
+            <label class="question-objetiva">Observações:</label>
+            <textarea id="field" class="textarea"></textarea>
+        </section>
+        
+        <button type="submit" class="btn-submit">Enviar</button>
+    </form>
 </body>
 </html>
