@@ -4,20 +4,18 @@
     if(isset($_POST['login'])) {
         require('./config/db.php');
 
-        $userId = $_SESSION['userId'];
-
+        $userEmail = filter_var($_POST["userEmail"], FILTER_SANITIZE_EMAIL);
+        $password = filter_var($_POST["password"], FILTER_SANITIZE_STRING);
 
         $stmt = $pdo->prepare('SELECT * FROM users WHERE email = ?');
-        $stmt->execute([$userId]);
-
-
+        $stmt->execute([$userEmail]);
         $user = $stmt->fetch();
 
         if ($user !== false) {
         if (password_verify($password, $user->password)) {
         echo "A senha está correta";
         $_SESSION['userId'] = $user->id;
-        header('Location: http://localhost/cpdrogas/inc/header.php');
+        header('Location: http://localhost/cpdrogas/index.php');
         exit;
         } else {
         $wrongLogin = "O e-mail ou a senha do login está errado!";

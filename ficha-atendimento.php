@@ -9,8 +9,6 @@ if (isset($_POST['ficha'])) {
 }
 ?>
 
-<?php require('./inc/header.html'); ?>
-
 <?php
 
 $query = 'SELECT * FROM datas WHERE ';
@@ -300,6 +298,7 @@ if (isset($locais[$bairro])) {
     </select>
     <input type="submit" value="Obter Local" />
 </form>
+
 <?php
 if (isset($_POST['bairro'])) {
     $bairro = $_POST['bairro'];

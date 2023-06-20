@@ -1,0 +1,38 @@
+/* Definindo as cores */
+:root {
+    --cor-verde-claro: #b9e8c8;
+    --cor-verde-escuro: #106e56;
+    --cor-branco: #ffffff;
+    --cor-preto: #000000;
+    --cor-laranja: #ff7f00;
+  }
+  
+  /* Estilizando o formulário */
+  body {
+    background-color: var(--cor-verde-claro);
+  }
+  
+  h1 {
+    color: var(--cor-verde-escuro);
+  }
+  
+  label {
+    color: var(--cor-verde-escuro);
+  }
+  
+  input[type="text"],
+  input[type="number"],
+  input[type="date"],
+  textarea,
+  select {
+    background-color: var(--cor-branco);
+    color: var(--cor-preto);
+  }
+  
+  .btn-submit {
+    background-color: var(--cor-laranja);
+    color: var(--cor-branco);
+  }
+  
+  /* Adicione mais estilos conforme necessário para o restante do formulário */
+  
