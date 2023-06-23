@@ -1,76 +1,67 @@
 <?php
+if (isset($_POST['register'])) {
+    require('./config/db.php');
 
-    if(isset($_POST['register'])) {
-        require('./config/db.php');
-        // include("/config/db.php");
-        // $userName = $_POST["userName"];
-        // $userEmail = $_POST["userEmail"];
-        // $password = $_POST["password"];
-        $nomeusuario = filter_var($_POST["nomeusuario"], FILTER_SANITIZE_STRING);
-        $useremail = filter_var($_POST["useremail"], FILTER_SANITIZE_EMAIL);
-        $senha = filter_var($_POST["senha"], FILTER_SANITIZE_STRING);
-        $passwordHashed = password_hash($password, PASSWORD_DEFAULT);
+    $nomeusuario = filter_var($_POST["nomeusuario"], FILTER_SANITIZE_STRING);
+    $useremail = filter_var($_POST["useremail"], FILTER_SANITIZE_EMAIL);
+    $senha = filter_var($_POST["senha"], FILTER_SANITIZE_STRING);
+    $passwordHashed = password_hash($senha, PASSWORD_DEFAULT);
 
-        $sql="INSERT into users(id, name, email, password, role) 
-            VALUES (?, '$nomeusuario', '$useremail', '$senha', '?')";
+    $sql = "INSERT INTO users (name, email, password) VALUES (?, ?, ?)";
 
-            
-            if(filter_var($userEmail, FILTER_VALIDATE_EMAIL)) {
-            $stmt = $pdo -> prepare('SELECT * from users WHERE email = ? ');
-            $stmt -> execute([$userEmail]);
-            $totalUsers = $stmt -> rowCount();
+    if (filter_var($useremail, FILTER_VALIDATE_EMAIL)) {
+        $stmt = $conn->prepare('SELECT * FROM users WHERE email = ?');
+        $stmt->bind_param("s", $useremail);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $totalUsers = $result->num_rows;
 
-        echo $totalUsers . '<br >';
+        echo $totalUsers . '<br>';
 
-            if( $totalUsers > 0) {
-                // echo "E-mail já foi  adicionado <br>";
-                $emailTaken = "Email já foi adicionado";
-                } else {
-                $stmt = $pdo -> prepare('INSERT into users(name, email, password) VALUES(?, ?, ?)');
-                $stmt -> execute( [ $userName, $userEmail, $passwordHashed]);
-            } 
+        if ($totalUsers > 0) {
+            $emailTaken = "Email já foi adicionado";
+        } else {
+            $stmt = $conn->prepare('INSERT INTO users (name, email, password) VALUES (?, ?, ?)');
+            $stmt->bind_param("sss", $nomeusuario, $useremail, $passwordHashed);
+            if ($stmt->execute()) {
+                echo "Cadastro feito com sucesso!";
+            } else {
+                echo "Erro ao inserir dados: " . $stmt->error;
+            }
         }
-
-        // echo $userEmail . " " . $userName . " " . $password;
-
     }
+    $stmt->close();
+    $conn->close();
+}
 ?>
 
- 
 <?php require('./inc/header.html'); ?>
 
 <div class="container">
     <div class="card">
-
-        <div class="card-header bg-light mb-3">Registre-se
-            
+        <div class="card-header bg-light mb-3">Registre-se</div>
         <div class="card-body">
             <form action="/config/db.php" method="POST">
-
                 <div class="form-group">
                     <label for="nomeusuario">Usuário</label>
                     <input required type="text" name="nomeusuario" class="form-control" />
                 </div>
-
                 <div class="form-group">
                     <label for="useremail">E-mail</label>
                     <input required type="email" name="useremail" class="form-control" />
                     <br />
                     <?php if(isset($emailTaken)) { ?>
                         <p style="background-color: red"><?php echo $emailTaken ?></p>
-                    <?php } $emailTaken ?>
+                    <?php } ?>
                 </div>
-
                 <div class="form-group">
                     <label for="password">Senha</label>
                     <input required type="password" name="senha" class="form-control" />
                 </div>
-
-                <button name="login" type="submit" class="bt btn-primary">Login</button>
+                <button name="register" type="submit" class="btn btn-primary">Registrar</button>
             </form>
         </div>
-        </div>
-
     </div>
+</div>
 
-    <?php require('./inc/footer.html') ?>
+<?php require('./inc/footer.html') ?>

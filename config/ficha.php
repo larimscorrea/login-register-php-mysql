@@ -1,5 +1,16 @@
 <?php
     $host = 'localhost';
+    $usuario = 'root';
+    $senha = '';
+    $banco = 'cpdrogas-project';
+    
+    $connection = mysqli_connect($host, $usuario, $senha, $banco);
+    
+    if (!$connection) {
+        die("Falha na conexão: " . mysqli_connect_error());
+    }
+    
+    $host = 'localhost';
     $cpfNumber = '';
     $generoSelecionado = '';
     $gestante = '';

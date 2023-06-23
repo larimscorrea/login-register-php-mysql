@@ -1,158 +1,260 @@
 <?php
-if (isset($_POST['ficha'])) {
-    require('.config/db.php');
+try {
+    if (isset($_POST['ficha-atendimento'])) {
+        require('.config/db.php');
 
-    $stmt = $pdo->prepare('SELECT * from datas WHERE id = ?');
+        $stmt = $pdo->prepare('SELECT * from datas WHERE id = ?');
 
-    $stmt->execute([$_POST['ficha']]);
-    $user = $stmt->fetch();
-}
-?>
+        $stmt->execute([$_POST['ficha-atendimento']]);
+        $user = $stmt->fetch();
+    }
 
-<?php
-
-$query = 'SELECT * FROM datas WHERE ';
-$result = $client->query($query);
-$rows = $result->fetchAll(PDO::FETCH_ASSOC);
-print_r($rows);
-
-$client = null;
-
-if (isset($_POST['numberFicha'])) {
-    $fichaNumber = $_POST['numberFicha'];
-} else {
-    echo "<p style='color: red'>Campo Nº da ficha não está definido.</p>";
-
+    $host = 'localhost';
+    $usuario = 'root';
+    $senha = '';
+    $banco = 'cpdrogas-project';
 
     // Conexão com o banco de dados
     try {
-    $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $pdo = new PDO("mysql:host=$host;dbname=$banco", $usuario, $senha);
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        echo "Conexão estabelecida com sucesso.";
+
+        if (isset($_POST['nomeusuario']) && isset($_POST['useremail']) && isset($_POST['senha'])) {
+            $nome = $_POST['nomeusuario'];
+            $email = $_POST['useremail'];
+            $senha = $_POST['senha'];
+
+            // Validação dos campos
+            if (empty($nome) || empty($email) || empty($senha)) {
+                throw new Exception("Todos os campos devem ser preenchidos.");
+            } else {
+                // Melhoria: Use uma função de hash para armazenar a senha no banco de dados
+                $hashSenha = password_hash($senha, PASSWORD_DEFAULT);
+
+                // Inserção no banco de dados
+                $stmt = $pdo->prepare("INSERT INTO users (nome, email, senha) VALUES (?, ?, ?)");
+                $stmt->execute([$nome, $email, $hashSenha]);
+
+                if ($stmt->rowCount() > 0) {
+                    echo "Cadastro feito com sucesso!";
+                } else {
+                    throw new Exception("Erro ao inserir dados.");
+                }
+            }
+        } else {
+            throw new Exception("Campos de formulário não estão definidos.");
+        }
     } catch (PDOException $e) {
-    die("Erro de conexão com o banco de dados: " . $e->getMessage());
+        throw new Exception("Falha na conexão: " . $e->getMessage());
     }
 
-    // Inserir dados no banco de dados
-    $query = 'INSERT INTO datas (ficha_number) VALUES (?)';
-    $stmt = $pdo->prepare($query);
-    $stmt->execute([$fichaNumber]);
+    if (isset($_POST['numero_da_ficha'])) {
+        $numero_da_ficha = $_POST['numero_da_ficha'];
 
-    // Verificar se a inserção foi bem-sucedida
-    if ($stmt->rowCount() > 0) {
-    echo "Dados inseridos no banco de dados.";
-    } else {
-    echo "Falha ao inserir dados no banco de dados.";
-    }
+        // Inserção de dados na tabela "fichaatendimentos"
+        try {
+            $query = 'INSERT INTO fichaatendimentos (numero_da_ficha) VALUES (?)';
+            $stmt = $pdo->prepare($query);
+            $stmt->execute([$numero_da_ficha]);
 
-}
-// Implementações próximas:
-// - Teste: verificar se o dado está ficando armazenado no banco de dados na tabela específica.
+            if ($stmt->rowCount() > 0) {
+                echo "Dados inseridos na tabela 'fichaatendimentos'.";
+            } else {
+                throw new Exception("Falha ao inserir dados na tabela 'fichaatendimentos'.");
+            }
+        } catch (PDOException $e) {
+            throw new Exception("Erro ao inserir dados: " . $e->getMessage());
+        }
+    } else if (isset($_POST['cpf'])) {
+        $cpf = $_POST['cpf'];
 
-//Implementação futura:
-//Sistema gerar um número de ficha baseado em um algoritmo criado para o próprio sistema.
+        //Validador de CPF
+        function testaCPF($strCPF) {
+            $soma = 0;
 
-if (isset($_POST['cpfNumber'])) {
-    $cpfNumber = $_POST['cpfNumber'];
+            if ($strCPF == "00000000000") return false;
+            if ($strCPF == "11111111111") return false;
+            if ($strCPF == "22222222222") return false;
+            if ($strCPF == "33333333333") return false;
+            if ($strCPF == "44444444444") return false;
+            if ($strCPF == "55555555555") return false;
+            if ($strCPF == "66666666666") return false;
+            if ($strCPF == "77777777777") return false;
+            if ($strCPF == "88888888888") return false;
+            if ($strCPF == "99999999999") return false;
 
-    //Validador de cpf
-    function testaCPF($strCPF)
-    {
-        $soma = 0;
+            for ($i = 1; $i <= 9; $i++) {
+                $soma += intval(substr($strCPF, $i - 1, 1)) * (11 - $i);
+            }
 
-        if ($strCPF == "00000000000") return false;
-        if ($strCPF == "11111111111") return false;
-        if ($strCPF == "22222222222") return false;
-        if ($strCPF == "33333333333") return false;
-        if ($strCPF == "44444444444") return false;
-        if ($strCPF == "55555555555") return false;
-        if ($strCPF == "66666666666") return false;
-        if ($strCPF == "77777777777") return false;
-        if ($strCPF == "88888888888") return false;
-        if ($strCPF == "99999999999") return false;
+            $resto = ($soma * 10) % 11;
+            if ($resto == 10 || $resto == 11) $resto = 0;
+            if ($resto != intval(substr($strCPF, 9, 1))) return false;
 
-        for ($i = 1; $i <= 9; $i++) {
-            $soma += intval(substr($strCPF, $i - 1, 1)) * (11 - $i);
+            $soma = 0;
+            for ($i = 1; $i <= 10; $i++) {
+                $soma += intval(substr($strCPF, $i - 1, 1)) * (12 - $i);
+            }
+
+            $resto = ($soma * 10) % 11;
+            if ($resto == 10 || $resto == 11) $resto = 0;
+            if ($resto != intval(substr($strCPF, 10, 1))) return false;
+
+            return true;
         }
 
-        $resto = ($soma * 10) % 11;
-        if ($resto == 10 || $resto == 11) $resto = 0;
-        if ($resto != intval(substr($strCPF, 9, 1))) return false;
-
-        $soma = 0;
-        for ($i = 1; $i <= 10; $i++) {
-            $soma += intval(substr($strCPF, $i - 1, 1)) * (12 - $i);
+        // Validação do CPF
+        if (testaCPF($cpf)) {
+            echo "<p style='color: green'>CPF válido</p>";
+        } else {
+            echo "<p style='color: red'>CPF inválido</p>";
         }
 
-        $resto = ($soma * 10) % 11;
-        if ($resto == 10 || $resto == 11) $resto = 0;
-        if ($resto != intval(substr($strCPF, 10, 1))) return false;
+        // Inserção de dados na tabela "fichaatendimentos"
+        try {
+            $query = 'INSERT INTO fichaatendimentos (cpf) VALUES (?)';
+            $stmt = $pdo->prepare($query);
+            $stmt->execute([$cpf]);
 
-        return true;
+            if ($stmt->rowCount() > 0) {
+                echo "Dados inseridos na tabela 'fichaatendimentos'.";
+            } else {
+                throw new Exception("Falha ao inserir dados na tabela 'fichaatendimentos'.");
+            }
+        } catch (PDOException $e) {
+            throw new Exception("Erro ao inserir dados: " . $e->getMessage());
+        }
+    } else if(isset($_POST['quem_procurou_ajuda'])) {
+        $quem_procurou_ajuda = $_POST['$quem_procurou_ajuda'];
+
+        function quemAjuda() {
+                switch ($_POST['$quem_procurou_ajuda']) {
+                case "Usuário":
+                    break;
+                
+                case "Usuário e família":
+                    break;
+                
+                case "Família":
+                    break;
+                
+                case "Amigos e conhecidos":
+                    break;
+                
+                case "Promotorias de Justiça":
+                    break;
+                
+                case "Técnicos de instituições":
+                    break;
+        
+                default: 
+                break;
+
+                }
+        }
+
+    // Inserção de dados na tabela "fichaatendimentos"
+    try {
+        $query = 'INSERT INTO fichaatendimentos (quem_procurou_atendimento) VALUES (?)';
+        $stmt = $pdo->prepare($query);
+        $stmt->execute([$quem_procurou_ajuda]);
+
+        if ($stmt->rowCount() > 0) {
+            echo "Dados inseridos na tabela 'fichaatendimentos'.";
+        } else {
+            throw new Exception("Falha ao inserir dados na tabela 'fichaatendimentos'.");
+        }
+    } catch (PDOException $e) {
+        throw new Exception("Erro ao inserir dados: " . $e->getMessage());
     }
 
-    // Chamada da função para validar CPF
-    if (testaCPF($cpfNumber)) {
-        echo "<p style='color: green'> CPF válido</p>";
-    } else {
-        echo "<p style='color: red'> CPF inválido</p>";
+} else if(isset($_POST['como_ficou_sabendo'])) {
+    $como_ficou_sabendo = $_POST['como_ficou_sabendo'];
+    
+    // Inserção de dados na tabela
+    try {
+        $query = 'INSERT INTO fichaatendimentos (como_ficou_sabendo) VALUES (?)';
+        $stmt = $pdo->prepare($query);
+        $stmt->execute([$como_ficou_sabendo]);
+
+        if($stmt->rowCount() > 0) {
+            echo "Dados inseridos na tabela 'fichaatendimentos'. ";
+        } else {
+            throw new Exception("Falha ao inserir dados na tabela 'fichaatendimentos'.");
+        }
+    } catch (PDOException $e) {
+        throw new Exception("Erro ao inserir dados: " . $e->getMessage());
     }
+
+} else if(isset($_POST['genero'])) {
+    $genero = $_POST['genero'];
+
+    // Inserção de dados na tabela
+    try {
+        $query = 'INSERT INTO fichaatendimentos (genero) VALUES (?)';
+        $stmt = $pdo->prepare($query);
+        $stmt->execute([$genero]);
+
+        if($stmt->rowCount() > 0) {
+            echo "Dados inseridos na tabela 'fichaatendimentos'. ";
+        } else {
+            throw new Exception("Falha ao inserir dados na tabela 'fichaatendimentos'.");
+        }
+    } catch (PDOException $e) {
+        throw new Exception("Erro ao inserir dados: " . $e->getMessage());
+    }
+
+} else if(isset($_POST['gestante'])) {
+    $gestante = $_POST['gestante'];
+    function possivelGestante($genero, $gestante) {
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $selectOption = $_POST['genero']; 
+            $opcaoSelecionada = $_POST['opcao'] ?? ''; //Correção do erro com atribuição da variável
+            echo "Opção selecionada: " . $selectOption;
+            echo "<p>Gestante?</p>";
+            echo "<label><input type='radio' name='opcao' value='Sim' " . ($opcaoSelecionada == 'sim' ? 'checked' : '') . " /> Sim</label> 
+                <label><input type='radio' name='opcao' value='Nao' " . ($opcaoSelecionada == 'nao' ? 'checked' : '') . " /> Não</label>";
+        } else {
+            echo "<p>Você não é gestante.</p>";
+        }
+    }
+
+    try {
+        $query = 'INSERT INTO fichaatendimentos (gestante) VALUES (?)';
+        $stmt = $pdo->prepare($query);
+        $stmt->execute([$gestante]);
+
+        if($stmt->rowCount() > 0) {
+            echo "Dados inseridos na tabela 'fichaatendimentos'. ";
+        } else {
+            throw new Exception("Falha ao inserir dados na tabela 'fichaatendimentos'.");
+        }
+    } catch (PDOException $e) {
+        throw new Exception("Erro ao inserir dados: " . $e->getMessage());
+    }
+
 } else {
-    echo "Campo CPF não está definido.";
-}
-
-// Implementações próximas:
-// - Teste: verificar se o dado está ficando armazenado no banco de dados na tabela específica.
-
-//Implementações.
-?>
-
-<?php
-
-$ajuda = $_POST['ajuda'];
-
-function quemAjuda() {
-    if(isset($_POST['ajuda'])) {
-        $ajuda = $_POST['ajuda'];
-
-        switch ($ajuda) {
-        case "Usuário":
-            break;
-        
-        case "Usuário e família":
-            break;
-        
-        case "Família":
-            break;
-        
-        case "Amigos e conhecidos":
-            break;
-        
-        case "Promotorias de Justiça":
-            break;
-        
-        case "Técnicos de instituições":
-            break;
-
-        default: 
-        break;
-
-        } 
+        throw new Exception("<p style='color: red'>Alguns campos da ficha de atendimento não estão preenchidos.</p>");
     }
+    // Fechar a conexão
+    $pdo = null;
+} catch (Exception $e) {
+    echo "Erro: " . $e->getMessage();
 }
-
-quemAjuda();
-
 ?>
 
-<?php 
 
-if(isset($_POST['comoSoube'])) {
-    $comoSoube = $_POST['comoSoube'];
-} else {
-    echo "";
-}
+<!-- Implementações próximas: -->
+<!-- Teste: verificar se o dado está ficando armazenado no banco de dados na tabela específica. -->
 
-?>
+<!-- Implementação futura:
+Sistema gerar um número de ficha baseado em um algoritmo criado para o próprio sistema. -->
+
+
+<!-- Implementações próximas:
+Teste: verificar se o dado está ficando armazenado no banco de dados na tabela específica. -->
+
 
 <?php
 // Abre um input na questão do gênero
@@ -173,7 +275,6 @@ function possivelGestante($genero, $gestante) {
 }
 
 // Chamada da função
-possivelGestante($genero, $gestante);
 ?>
 
 
@@ -549,6 +650,14 @@ if (isset($_POST['remove'])) {
     exit;
 }
 ?>
+
+<!-- Espaço para chamar as funções -->
+
+<?php 
+quemAjuda(); 
+possivelGestante($genero, $gestante);
+
+?>
 <?php require('./inc/header.html'); ?>
 
 
@@ -561,17 +670,17 @@ if (isset($_POST['remove'])) {
     <title>Document</title>
 </head>
 <body>
-    <form action="">
+    <form action="/config/db.php" method="POST">
         <main>
             <h1>Ficha de Acolhimento Individual</h1>
             <div class="box-dados-iniciais">
                 <div class="dados-iniciais">
                     <label for="input-inicial" class="question-objetiva">Nº da ficha:</label>
-                    <input class="input-text" id="field" />
+                    <input class="input-text" id="field" name="numero_da_ficha"/>
                 </div>
                 <div class="dados-iniciais">
                     <label for="input-inicial" class="question-objetiva">CPF:</label>
-                    <input class="input-text input-cpf" id="field" />
+                    <input class="input-text input-cpf" id="field" name="cpf" />
                 </div>
             </div>
         </main>
