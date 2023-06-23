@@ -1,8 +1,8 @@
 <?php
 
     if(isset($_POST['register'])) {
-        // require('./config/db.php');
-        include("/config/db.php");
+        require('./config/db.php');
+        // include("/config/db.php");
         // $userName = $_POST["userName"];
         // $userEmail = $_POST["userEmail"];
         // $password = $_POST["password"];

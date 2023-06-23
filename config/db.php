@@ -2,16 +2,23 @@
 $host = 'localhost';
 $usuario = 'root';
 $senha = '';
-$data = 'cpdrogas-project';
-$conn = mysqli_connect($host, $usuario, $senha, $data);
+$banco = 'cpdrogas-project';
+
+$conn = mysqli_connect($host, $usuario, $senha, $banco);
+
+// Troquei data por banco.
 
 if ($conn) {
+    // Estrutura condicional que testa primeiro se a conexão foi estabelecida com sucesso.
     echo "Conexão estabelecida com sucesso.";
 
     if (isset($_POST['nomeusuario']) && isset($_POST['email']) && isset($_POST['senha'])) {
-        $nome = $_POST['nomeusuario'];
-        $email = $_POST['email'];
-        $senha = $_POST['senha'];
+        $nome = mysqli_real_escape_string($conn, $_POST['nomeusuario']);
+        $email = mysqli_real_escape_string($conn, $_POST['email']);
+        $senha = mysqli_real_escape_string($conn, $_POST['senha']);
+        // $nome = $_POST['nomeusuario'];
+        // $email = $_POST['email'];
+        // $senha = $_POST['senha'];
 
         // Melhoria: Use uma função de hash para armazenar a senha no banco de dados
         $hashSenha = password_hash($senha, PASSWORD_DEFAULT);
@@ -29,7 +36,7 @@ if ($conn) {
 
     // Preparar a consulta SQL para inserir os dados na tabela
     $query = "INSERT INTO usuarios (cpfNumber, generoSelecionado, gestante, emrua, kidscasa, subsusadas, firstsubs, subemuso, timeuso, timeposuso, ajudalocal, orgaoatendimento, pensarsuicidio, formasuicidio, timesuicidio, expectativatratamento, atendimentopresencial, relatoatendimento, encaminhamento, datetimeatendimento, profissionalatendimento) 
-              VALUES ('$cpfNumber', '$generoSelecionado', '$gestante', '$emrua', '$kidscasa', '$subsusadas', '$firstsubs', '$subemuso', '$timeuso', '$timeposuso', '$ajudalocal', '$orgaoatendimento', '$pensarsuicidio', '$formasuicidio', '$timesuicidio', '$expectativatratamento', '$atendimentopresencial', '$relatoatendimento', '$encaminhamento', '$datetimeatendimento', '$profissionalatendimento')";
+    VALUES ('$cpfNumber', '$generoSelecionado', '$gestante', '$emrua', '$kidscasa', '$subsusadas', '$firstsubs', '$subemuso', '$timeuso', '$timeposuso', '$ajudalocal', '$orgaoatendimento', '$pensarsuicidio', '$formasuicidio', '$timesuicidio', '$expectativatratamento', '$atendimentopresencial', '$relatoatendimento', '$encaminhamento', '$datetimeatendimento', '$profissionalatendimento')";
 
     // Executar a consulta
     $result = mysqli_query($conn, $query);
