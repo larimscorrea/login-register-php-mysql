@@ -207,18 +207,6 @@ try {
 
 } else if(isset($_POST['gestante'])) {
     $gestante = $_POST['gestante'];
-    function possivelGestante($genero, $gestante) {
-        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            $selectOption = $_POST['genero']; 
-            $opcaoSelecionada = $_POST['opcao'] ?? ''; //Correção do erro com atribuição da variável
-            echo "Opção selecionada: " . $selectOption;
-            echo "<p>Gestante?</p>";
-            echo "<label><input type='radio' name='opcao' value='Sim' " . ($opcaoSelecionada == 'sim' ? 'checked' : '') . " /> Sim</label> 
-                <label><input type='radio' name='opcao' value='Nao' " . ($opcaoSelecionada == 'nao' ? 'checked' : '') . " /> Não</label>";
-        } else {
-            echo "<p>Você não é gestante.</p>";
-        }
-    }
 
     try {
         $query = 'INSERT INTO fichaatendimentos (gestante) VALUES (?)';
@@ -234,6 +222,545 @@ try {
         throw new Exception("Erro ao inserir dados: " . $e->getMessage());
     }
 
+} else if(isset($_POST['endereco'])) { 
+    $endereco = $pdo->prepare($query);
+
+    try {
+        $query = 'INSERT INTO fichaatendimentos (endereco) VALUES (?)';
+        $stmt = $pdo->prepare($query);
+        $stmt->execute([$endereco]);
+
+        if($stmt->rowCount() > 0) {
+            echo "Dados inseridos na tabela 'fichaatendimentos'. ";
+        } else {
+            throw new Exception("Falha ao inserir dados na tabela 'fichaatendimentos'.");
+        }
+    } catch (PDOException $e) {
+        throw new Exception("Erro ao inserir dados: " . $e->getMessage());
+    }
+    
+} else if(isset($_POST['bairro'])) {
+    $bairro = $pdo->prepare($query);
+
+    $locais = array(
+        "nãodefinido" => array("Regional" => "", "Território" => ""), 
+        "aerolandia" => array("Regional" => "Regional 6", "Território" => "Território 26"),
+        "aeroporto" => array("Regional" => "Regional 4", "Território" => "Território 18"),
+        "aldeota" => array("Regional" => "Regional 2", "Território" => "Território 7"),
+        "altodabalanca" => array("Regional" => "Regional 6", "Território" => "Território 27"),
+        "alvaroweyne" => array("Regional" => "Regional 2", "Território" => "Território 7"),
+        "amadeufurtado" => array("Regional" => "Regional 1", "Território" => "Território 4"),
+        "antoniobezerra" => array("Regional" => "Regional 3", "Território" => "Território 13"),
+        "barradoceara" => array("Regional" => "Regional 1", "Território" => "Território 2"),
+        "belavista" => array("Regional" => "Regional 6", "Território" => "Território 27"),
+        "benfica" => array("Regional" => "Regional 1", "Território" => "Território 3"),
+        "bomfuturo" => array("Regional" => "Regional 3", "Território" => "Território 13"),
+        "boavista" => array("Regional" => "Regional 3", "Território" => "Território 11"),
+        "bomjardim" => array("Regional" => "Regional 3", "Território" => "Território 12"),
+        "bonsucesso" => array("Regional" => "Regional 3", "Território" => "Território 12"),
+        "caisdoporto" => array("Regional" => "Regional 1", "Território" => "Território 1"),
+        "cajazeiras" => array("Regional" => "Regional 3", "Território" => "Território 12"),
+        "cambeba" => array("Regional" => "Regional 4", "Território" => "Território 18"),
+        "carlitopamplona" => array("Regional" => "Regional 2", "Território" => "Território 7"),
+        "centro" => array("Regional" => "Regional 1", "Território" => "Território 1"),
+        "cidade2" => array("Regional" => "Regional 2", "Território" => "Território 6"),
+        "cidadedosf" => array("Regional" => "Regional 4", "Território" => "Território 17"),
+        "coac" => array("Regional" => "Regional 5", "Território" => "Território 20"),
+        "coco" => array("Regional" => "Regional 4", "Território" => "Território 17"),
+        "conjuntoceara1" => array("Regional" => "Regional 5", "Território" => "Território 20"),
+        "conjuntoceara2" => array("Regional" => "Regional 5", "Território" => "Território 20"),
+        "cristoredentor" => array("Regional" => "Regional 2", "Território" => "Território 6"),
+        "curio" => array("Regional" => "Regional 6", "Território" => "Território 26"),
+        "damas" => array("Regional" => "Regional 2", "Território" => "Território 6"),
+        "delourdes" => array("Regional" => "Regional 1", "Território" => "Território 3"),
+        "democritorocha" => array("Regional" => "Regional 5", "Território" => "Território 21"),
+        "dende" => array("Regional" => "Regional 6", "Território" => "Território 25"),
+        "dionisiotorres" => array("Regional" => "Regional 2", "Território" => "Território 7"),
+        "domlustosa" => array("Regional" => "Regional 4", "Território" => "Território 17"),
+        "dunas" => array("Regional" => "Regional 4", "Território" => "Território 17"),
+        "edsonqueiroz" => array("Regional" => "Regional 4", "Território" => "Território 18"),
+        "fariasbrito" => array("Regional" => "Regional 1", "Território" => "Território 2"),
+        "floresta" => array("Regional" => "Regional 1", "Território" => "Território 3"),
+        "genibau" => array("Regional" => "Regional 5", "Território" => "Território 21"),
+        "guajeru" => array("Regional" => "Regional 6", "Território" => "Território 26"),
+        "granjaportugal" => array("Regional" => "Regional 5", "Território" => "Território 21"),
+        "granjalisboa" => array("Regional" => "Regional 5", "Território" => "Território 20"),
+        "henriquejorge" => array("Regional" => "Regional 4", "Território" => "Território 17"),
+        "itaoca" => array("Regional" => "Regional 6", "Território" => "Território 26"),
+        "itaperi" => array("Regional" => "Regional 4", "Território" => "Território 16"),
+        "jacarecanga" => array("Regional" => "Regional 1", "Território" => "Território 1"),
+        "jardimamerica" => array("Regional" => "Regional 2", "Território" => "Território 6"),
+        "jardimguanabara" => array("Regional" => "Regional 4", "Território" => "Território 17"),
+        "jardimdasoliveiras" => array("Regional" => "Regional 5", "Território" => "Território 19"),
+        "jardimiracema" => array("Regional" => "Regional 2", "Território" => "Território 6"),
+        "joaquimtavora" => array("Regional" => "Regional 2", "Território" => "Território 7"),
+        "josebonifacio" => array("Regional" => "Regional 1", "Território" => "Território 3"),
+        "josedealencar" => array("Regional" => "Regional 5", "Território" => "Território 21"),
+        "lagoaredonda" => array("Regional" => "Regional 4", "Território" => "Território 17"),
+        "maraponga" => array("Regional" => "Regional 4", "Território" => "Território 16"),
+        "meireles" => array("Regional" => "Regional 2", "Território" => "Território 5"),
+        "messejana" => array("Regional" => "Regional 6", "Território" => "Território 26"),
+        "montese" => array("Regional" => "Regional 4", "Território" => "Território 16"),
+        "mondubim" => array("Regional" => "Regional 4", "Território" => "Território 17"),
+        "montecastelo" => array("Regional" => "Regional 1", "Território" => "Território 3"),
+        "mourabrasil" => array("Regional" => "Regional 2", "Território" => "Território 5"),
+        "mucuripe" => array("Regional" => "Regional 2", "Território" => "Território 5"),
+        "otaviobonfim" => array("Regional" => "Regional 2", "Território" => "Território 5"),
+        "olavooliveira" => array("Regional" => "Regional 4", "Território" => "Território 16"),
+        "padreandrade" => array("Regional" => "Regional 1", "Território" => "Território 3"),
+        "papicu" => array("Regional" => "Regional 2", "Território" => "Território 5"),
+        "paupina" => array("Regional" => "Regional 6", "Território" => "Território 26"),
+        "parangaba" => array("Regional" => "Regional 4", "Território" => "Território 17"),
+        "parreao" => array("Regional" => "Regional 4", "Território" => "Território 17"),
+        "parquearaxa" => array("Regional" => "Regional 6", "Território" => "Território 26"),
+        "parqueiracema" => array("Regional" => "Regional 2", "Território" => "Território 6"),
+        "parquelandia" => array("Regional" => "Regional 1", "Território" => "Território 3"),
+        "parquemanibura" => array("Regional" => "Regional 6", "Território" => "Território 25"),
+        "parquesantamaria" => array("Regional" => "Regional 5", "Território" => "Território 19"),
+        "parquesaojose" => array("Regional" => "Regional 6", "Território" => "Território 26"),
+        "passare" => array("Regional" => "Regional 4", "Território" => "Território 17"),
+        "pedras" => array("Regional" => "Regional 2", "Território" => "Território 7"),
+        "pici" => array("Regional" => "Regional 4", "Território" => "Território 16"),
+        "pirambu" => array("Regional" => "Regional 1", "Território" => "Território 1"),
+        "praiadeiracema" => array("Regional" => "Regional 2", "Território" => "Território 5"),
+        "praiadofuturoi" => array("Regional" => "Regional 2", "Território" => "Território 5"),
+        "praiadofuturoii" => array("Regional" => "Regional 2", "Território" => "Território 5"),
+        "prainha" => array("Regional" => "Regional 2", "Território" => "Território 5"),
+        "presidentekennedy" => array("Regional" => "Regional 4", "Território" => "Território 18"),
+        "quintinocunha" => array("Regional" => "Regional 3", "Território" => "Território 13"),
+        "rodrigotorres" => array("Regional" => "Regional 1", "Território" => "Território 2"),
+        "sabia" => array("Regional" => "Regional 6", "Território" => "Território 25"),
+        "salinasaerolandia" => array("Regional" => "Regional 6", "Território" => "Território 26"),
+        "santafelicidade" => array("Regional" => "Regional 5", "Território" => "Território 19"),
+        "santamaria" => array("Regional" => "Regional 6", "Território" => "Território 25"),
+        "serrinha" => array("Regional" => "Regional 6", "Território" => "Território 27"),
+        "silvionor" => array("Regional" => "Regional 4", "Território" => "Território 17"),
+        "sitioconde" => array("Regional" => "Regional 4", "Território" => "Território 18"),
+        "sitioverde" => array("Regional" => "Regional 4", "Território" => "Território 18"),
+        "tancredoneves" => array("Regional" => "Regional 3", "Território" => "Território 14"),
+        "vilaellery" => array("Regional" => "Regional 3", "Território" => "Território 13"),
+        "vilalobos" => array("Regional" => "Regional 4", "Território" => "Território 16"),
+        "vilamanuelsatiro" => array("Regional" => "Regional 3", "Território" => "Território 13"),
+        "vilarodrigues" => array("Regional" => "Regional 3", "Território" => "Território 13")
+    );
+    
+    if (isset($_POST['bairro'])) {
+        $bairro = $_POST['bairro'];
+    
+        if (isset($locais[$bairro])) {
+            $regional = $locais[$bairro]['Regional'];
+            $territorio = $locais[$bairro]['Território'];
+    
+            echo "O bairro $bairro está localizado na $regional e $territorio.";
+    
+            try {
+                $query = 'INSERT INTO fichaatendimentos (bairro, regional, territorio) VALUES (?, ?, ?)';
+                $stmt = $pdo->prepare($query);
+                $stmt->execute([$bairro, $regional, $territorio]);
+    
+                if ($stmt->rowCount() > 0) {
+                    echo "Dados inseridos na tabela 'fichaatendimentos'.";
+                } else {
+                    throw new Exception("Falha ao inserir dados na tabela 'fichaatendimentos'.");
+                }
+            } catch (PDOException $e) {
+                throw new Exception("Erro ao inserir dados: " . $e->getMessage());
+            }
+        } else {
+            echo "Não há informações disponíveis para o bairro $bairro.";
+        }
+    }
+
+} else if(isset($_POST['regional'])) {
+    $regional = $pdo->prepare($query);
+
+    try {
+        $query = 'INSERT INTO fichaatendimentos (regional) VALUES (?)';
+        $stmt = $pdo->prepare($query);
+        $stmt->execute([$regional]);
+
+        if($stmt->rowCount() > 0) {
+            echo "Dados inseridos na tabela 'fichaatendimentos'. ";
+        } else {
+            throw new Exception("Falha ao inserir dados na tabela 'fichaatendimentos'.");
+        }
+    } catch (PDOException $e) {
+        throw new Exception("Erro ao inserir dados: " . $e->getMessage());
+    }
+
+
+} else if(isset($_POST['territorio'])) {
+    $territorio = $pdo->prepare($query);
+
+    try {
+        $query = 'INSERT INTO fichaatendimentos (regional) VALUES (?)';
+        $stmt = $pdo->prepare($query);
+        $stmt->execute([$regional]);
+
+        if($stmt->rowCount() > 0) {
+            echo "Dados inseridos na tabela 'fichaatendimentos'. ";
+        } else {
+            throw new Exception("Falha ao inserir dados na tabela 'fichaatendimentos'.");
+        }
+    } catch (PDOException $e) {
+        throw new Exception("Erro ao inserir dados: " . $e->getMessage());
+    }
+} else if(isset($_POST['em_situacao_de_rua'])) {
+    $em_situacao_de_rua = $pdo->prepare($query);
+
+    try {
+        $query = 'INSERT INTO fichaatendimentos (em_situacao_de_rua) VALUES (?)';
+        $stmt = $pdo->prepare($query);
+        $stmt->execute([$em_situacao_de_rua]);
+
+        if($stmt->rowCount() > 0) {
+            echo "Dados inseridos na tabela 'fichaatendimentos'. ";
+        } else {
+            throw new Exception("Falha ao inserir dados na tabela 'fichaatendimentos'.");
+        }
+    } catch (PDOException $e) {
+        throw new Exception("Erro ao inserir dados: " . $e->getMessage());
+    }
+
+} else if(isset($_POST['pessoa_com_deficiencia'])) {
+    $pessoa_com_deficiencia = $pdo->prepare($query);
+
+    try {
+        $query = 'INSERT INTO fichaatendimentos (pessoa_com_deficiencia) VALUES (?)';
+        $stmt = $pdo->prepare($query);
+        $stmt->execute([$pessoa_com_deficiencia]);
+
+        if($stmt->rowCount() > 0) {
+            echo "Dados inseridos na tabela 'fichaatendimentos'. ";
+        } else {
+            throw new Exception("Falha ao inserir dados na tabela 'fichaatendimentos'.");
+        }
+    } catch (PDOException $e) {
+        throw new Exception("Erro ao inserir dados: " . $e->getMessage());
+    }
+} else if(isset($_POST['criancas_faixa_etaria_0_5'])) {
+    $criancas_faixa_etaria_0_5 = $pdo->prepare($query);
+
+    try {
+        $query = 'INSERT INTO fichaatendimentos (criancas_faixa_etaria_0_5) VALUES (?)';
+        $stmt = $pdo->prepare($query);
+        $stmt->execute([$criancas_faixa_etaria_0_5]);
+
+        if($stmt->rowCount() > 0) {
+            echo "Dados inseridos na tabela 'fichaatendimentos'. ";
+        } else {
+            throw new Exception("Falha ao inserir dados na tabela 'fichaatendimentos'.");
+        }
+    } catch (PDOException $e) {
+        throw new Exception("Erro ao inserir dados: " . $e->getMessage());
+    }
+} else if(isset($_POST['criancas_faixa_etaria_6_11'])) {
+    $criancas_faixa_etaria_6_11 = $pdo->prepare($query);
+
+    try {
+        $query = 'INSERT INTO fichaatendimentos (criancas_faixa_etaria_6_11) VALUES (?)';
+        $stmt = $pdo->prepare($query);
+        $stmt->execute([$criancas_faixa_etaria_6_11]);
+
+        if($stmt->rowCount() > 0) {
+            echo "Dados inseridos na tabela 'fichaatendimentos'. ";
+        } else {
+            throw new Exception("Falha ao inserir dados na tabela 'fichaatendimentos'.");
+        }
+    } catch (PDOException $e) {
+        throw new Exception("Erro ao inserir dados: " . $e->getMessage());
+    }
+}  else if(isset($_POST['criancas_faixa_etaria_12_17'])) {
+    $criancas_faixa_etaria_12_17 = $pdo->prepare($query);
+
+    try {
+        $query = 'INSERT INTO fichaatendimentos (criancas_faixa_etaria_12_17) VALUES (?)';
+        $stmt = $pdo->prepare($query);
+        $stmt->execute([$criancas_faixa_etaria_12_17]);
+
+        if($stmt->rowCount() > 0) {
+            echo "Dados inseridos na tabela 'fichaatendimentos'. ";
+        } else {
+            throw new Exception("Falha ao inserir dados na tabela 'fichaatendimentos'.");
+        }
+    } catch (PDOException $e) {
+        throw new Exception("Erro ao inserir dados: " . $e->getMessage());
+    }
+} else if(isset($_POST['substancias_usadas'])) {
+    $substancias_usadas = $pdo->prepare($query);
+
+    try {
+        $query = 'INSERT INTO fichaatendimentos (substancias_usadas) VALUES (?)';
+        $stmt = $pdo->prepare($query);
+        $stmt->execute([$substancias_usadas]);
+
+        if($stmt->rowCount() > 0) {
+            echo "Dados inseridos na tabela 'fichaatendimentos'. ";
+        } else {
+            throw new Exception("Falha ao inserir dados na tabela 'fichaatendimentos'.");
+        }
+    } catch (PDOException $e) {
+        throw new Exception("Erro ao inserir dados: " . $e->getMessage());
+    }
+
+} else if(isset($_POST['primeira_substancia'])) {
+    $primeira_substancia = $pdo->prepare($query);
+
+    try {
+        $query = 'INSERT INTO fichaatendimentos (primeira_substancia) VALUES (?)';
+        $stmt = $pdo->prepare($query);
+        $stmt->execute([$primeira_substancia]);
+
+        if($stmt->rowCount() > 0) {
+            echo "Dados inseridos na tabela 'fichaatendimentos'. ";
+        } else {
+            throw new Exception("Falha ao inserir dados na tabela 'fichaatendimentos'.");
+        }
+    } catch (PDOException $e) {
+        throw new Exception("Erro ao inserir dados: " . $e->getMessage());
+    }
+
+} else if(isset($_POST['quais_substancias_usa'])) {
+    $quais_substancias_usa = $pdo->prepare($query);
+
+    try {
+        $query = 'INSERT INTO fichaatendimentos (quais_substancias_usa) VALUES (?)';
+        $stmt = $pdo->prepare($query);
+        $stmt->execute([$quais_substancias_usa]);
+
+        if($stmt->rowCount() > 0) {
+            echo "Dados inseridos na tabela 'fichaatendimentos'. ";
+        } else {
+            throw new Exception("Falha ao inserir dados na tabela 'fichaatendimentos'.");
+        }
+    } catch (PDOException $e) {
+        throw new Exception("Erro ao inserir dados: " . $e->getMessage());
+    }
+} else if(isset($_POST['quanto_tempo_usa'])) {
+    $quanto_tempo_usa = $pdo->prepare($query);
+
+    try {
+        $query = 'INSERT INTO fichaatendimentos (quanto_tempo_usa) VALUES (?)';
+        $stmt = $pdo->prepare($query);
+        $stmt->execute([$quanto_tempo_usa]);
+
+        if($stmt->rowCount() > 0) {
+            echo "Dados inseridos na tabela 'fichaatendimentos'. ";
+        } else {
+            throw new Exception("Falha ao inserir dados na tabela 'fichaatendimentos'.");
+        }
+    } catch (PDOException $e) {
+        throw new Exception("Erro ao inserir dados: " . $e->getMessage());
+    }
+} else if(isset($_POST['quanto_tempo_apos_tratamento_procurou_ajuda_primeira_vez'])) {
+    $quanto_tempo_apos_tratamento_procurou_ajuda_primeira_vez = $pdo->prepare($query);
+
+    try {
+        $query = 'INSERT INTO fichaatendimentos (quanto_tempo_apos_tratamento_procurou_ajuda_primeira_vez) VALUES (?)';
+        $stmt = $pdo->prepare($query);
+        $stmt->execute([$quanto_tempo_apos_tratamento_procurou_ajuda_primeira_vez]);
+
+        if($stmt->rowCount() > 0) {
+            echo "Dados inseridos na tabela 'fichaatendimentos'. ";
+        } else {
+            throw new Exception("Falha ao inserir dados na tabela 'fichaatendimentos'.");
+        }
+    } catch (PDOException $e) {
+        throw new Exception("Erro ao inserir dados: " . $e->getMessage());
+    }
+} else if(isset($_POST['onde_procurou_ajuda_primeira_vez'])) {
+    $onde_procurou_ajuda_primeira_vez = $pdo->prepare($query);
+
+    try {
+        $query = 'INSERT INTO fichaatendimentos (onde_procurou_ajuda_primeira_vez) VALUES (?)';
+        $stmt = $pdo->prepare($query);
+        $stmt->execute([$onde_procurou_ajuda_primeira_vez]);
+
+        if($stmt->rowCount() > 0) {
+            echo "Dados inseridos na tabela 'fichaatendimentos'. ";
+        } else {
+            throw new Exception("Falha ao inserir dados na tabela 'fichaatendimentos'.");
+        }
+    } catch (PDOException $e) {
+        throw new Exception("Erro ao inserir dados: " . $e->getMessage());
+    }
+} else if(isset($_POST['orgaos_atendimentos'])) {
+    $orgaos_atendimentos = $pdo->prepare($query);
+
+    try {
+        $query = 'INSERT INTO fichaatendimentos (orgaos_atendimentos) VALUES (?)';
+        $stmt = $pdo->prepare($query);
+        $stmt->execute([$orgaos_atendimentos]);
+
+        if($stmt->rowCount() > 0) {
+            echo "Dados inseridos na tabela 'fichaatendimentos'. ";
+        } else {
+            throw new Exception("Falha ao inserir dados na tabela 'fichaatendimentos'.");
+        }
+    } catch (PDOException $e) {
+        throw new Exception("Erro ao inserir dados: " . $e->getMessage());
+    }
+} else if(isset($_POST['pensou_em_suicidio'])) {
+    $pensou_em_suicidio = $pdo->prepare($query);
+
+    try {
+        $query = 'INSERT INTO fichaatendimentos (pensou_em_suicidio) VALUES (?)';
+        $stmt = $pdo->prepare($query);
+        $stmt->execute([$pensou_em_suicidio]);
+
+        if($stmt->rowCount() > 0) {
+            echo "Dados inseridos na tabela 'fichaatendimentos'. ";
+        } else {
+            throw new Exception("Falha ao inserir dados na tabela 'fichaatendimentos'.");
+        }
+    } catch (PDOException $e) {
+        throw new Exception("Erro ao inserir dados: " . $e->getMessage());
+    }
+} else if(isset($_POST['tentou_sucidicio'])) {
+    $tentou_sucidicio = $pdo->prepare($query);
+
+    try {
+        $query = 'INSERT INTO fichaatendimentos (tentou_sucidicio) VALUES (?)';
+        $stmt = $pdo->prepare($query);
+        $stmt->execute([$tentou_sucidicio]);
+
+        if($stmt->rowCount() > 0) {
+            echo "Dados inseridos na tabela 'fichaatendimentos'. ";
+        } else {
+            throw new Exception("Falha ao inserir dados na tabela 'fichaatendimentos'.");
+        }
+    } catch (PDOException $e) {
+        throw new Exception("Erro ao inserir dados: " . $e->getMessage());
+    }
+} else if(isset($_POST['há_quanto_tempo'])) {
+    $há_quanto_tempo = $pdo->prepare($query);
+
+    try {
+        $query = 'INSERT INTO fichaatendimentos (há_quanto_tempo) VALUES (?)';
+        $stmt = $pdo->prepare($query);
+        $stmt->execute([$há_quanto_tempo]);
+
+        if($stmt->rowCount() > 0) {
+            echo "Dados inseridos na tabela 'fichaatendimentos'. ";
+        } else {
+            throw new Exception("Falha ao inserir dados na tabela 'fichaatendimentos'.");
+        }
+    } catch (PDOException $e) {
+        throw new Exception("Erro ao inserir dados: " . $e->getMessage());
+    }
+} else if(isset($_POST['expectativa_relacao_esse_atendimento'])) {
+    $expectativa_relacao_esse_atendimento = $pdo->prepare($query);
+
+    try {
+        $query = 'INSERT INTO fichaatendimentos (expectativa_relacao_esse_atendimento) VALUES (?)';
+        $stmt = $pdo->prepare($query);
+        $stmt->execute([$expectativa_relacao_esse_atendimento]);
+
+        if($stmt->rowCount() > 0) {
+            echo "Dados inseridos na tabela 'fichaatendimentos'. ";
+        } else {
+            throw new Exception("Falha ao inserir dados na tabela 'fichaatendimentos'.");
+        }
+    } catch (PDOException $e) {
+        throw new Exception("Erro ao inserir dados: " . $e->getMessage());
+    }
+} else if(isset($_POST['atendimento_presencial_cpdrogas'])) {
+    $atendimento_presencial_cpdrogas = $pdo->prepare($query); 
+
+    try {
+        $query = 'INSERT INTO fichaatendimentos (atendimento_presencial_cpdrogas) VALUES (?)';
+        $stmt = $pdo->prepare($query);
+        $stmt->execute([$atendimento_presencial_cpdrogas]);
+
+        if($stmt->rowCount() > 0) {
+            echo "Dados inseridos na tabela 'fichaatendimentos'. ";
+        } else {
+            throw new Exception("Falha ao inserir dados na tabela 'fichaatendimentos'.");
+        }
+    } catch (PDOException $e) {
+        throw new Exception("Erro ao inserir dados: " . $e->getMessage());
+    }
+} else if(isset($_POST['motivo_caso_negativa_atendimento_cpdrogas'])) {
+    $motivo_caso_negativa_atendimento_cpdrogas = $pdo->prepare($query);
+
+    try {
+        $query = 'INSERT INTO fichaatendimentos (motivo_caso_negativa_atendimento_cpdrogas) VALUES (?)';
+        $stmt = $pdo->prepare($query);
+        $stmt->execute([$motivo_caso_negativa_atendimento_cpdrogas]);
+
+        if($stmt->rowCount() > 0) {
+            echo "Dados inseridos na tabela 'fichaatendimentos'. ";
+        } else {
+            throw new Exception("Falha ao inserir dados na tabela 'fichaatendimentos'.");
+        }
+    } catch (PDOException $e) {
+        throw new Exception("Erro ao inserir dados: " . $e->getMessage());
+    }
+} else if(isset($_POST['relato_atendimento'])) {
+    $relato_atendimento = $pdo->prepare($query);
+
+    try {
+        $query = 'INSERT INTO fichaatendimentos (relato_atendimento) VALUES (?)';
+        $stmt = $pdo->prepare($query);
+        $stmt->execute([$relato_atendimento]);
+
+        if($stmt->rowCount() > 0) {
+            echo "Dados inseridos na tabela 'fichaatendimentos'. ";
+        } else {
+            throw new Exception("Falha ao inserir dados na tabela 'fichaatendimentos'.");
+        }
+    } catch (PDOException $e) {
+        throw new Exception("Erro ao inserir dados: " . $e->getMessage());
+    }
+} else if(isset($_POST['encaminhamento'])) {
+    $encaminhamento = $pdo->prepare($query);
+
+    try {
+        $query = 'INSERT INTO fichaatendimentos (encaminhamento) VALUES (?)';
+        $stmt = $pdo->prepare($query);
+        $stmt->execute([$encaminhamento]);
+
+        if($stmt->rowCount() > 0) {
+            echo "Dados inseridos na tabela 'fichaatendimentos'. ";
+        } else {
+            throw new Exception("Falha ao inserir dados na tabela 'fichaatendimentos'.");
+        }
+    } catch (PDOException $e) {
+        throw new Exception("Erro ao inserir dados: " . $e->getMessage());
+    }
+
+} else if(isset($_POST['data_atendimento'])) {
+    $data_atendimento = $pdo->prepare($query);
+
+    try {
+        $query = 'INSERT INTO fichaatendimentos (data_atendimento) VALUES (?)';
+        $stmt = $pdo->prepare($query);
+        $stmt->execute([$data_atendimento]);
+
+        if($stmt->rowCount() > 0) {
+            echo "Dados inseridos na tabela 'fichaatendimentos'. ";
+        } else {
+            throw new Exception("Falha ao inserir dados na tabela 'fichaatendimentos'.");
+        }
+    } catch (PDOException $e) {
+        throw new Exception("Erro ao inserir dados: " . $e->getMessage());
+    }
+} else if(isset($_POST['profissional'])) {
+    $profissional = $pdo->prepare($query);
+
+    try {
+        $query = 'INSERT INTO fichaatendimentos (profissional) VALUES (?)';
+        $stmt = $pdo->prepare($query);
+        $stmt->execute([$profissional]);
+
+        if($stmt->rowCount() > 0) {
+            echo "Dados inseridos na tabela 'fichaatendimentos'. ";
+        } else {
+            throw new Exception("Falha ao inserir dados na tabela 'fichaatendimentos'.");
+        }
+    } catch (PDOException $e) {
+        throw new Exception("Erro ao inserir dados: " . $e->getMessage());
+    }
 } else {
         throw new Exception("<p style='color: red'>Alguns campos da ficha de atendimento não estão preenchidos.</p>");
     }
@@ -256,158 +783,7 @@ Sistema gerar um número de ficha baseado em um algoritmo criado para o próprio
 Teste: verificar se o dado está ficando armazenado no banco de dados na tabela específica. -->
 
 
-<?php
-// Abre um input na questão do gênero
-$genero = $_POST['genero'] ?? '';
-$gestante = $_POST['gestante'] ?? '';
 
-function possivelGestante($genero, $gestante) {
-    if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-        $selectOption = $_POST['genero']; 
-        $opcaoSelecionada = $_POST['opcao'] ?? ''; //Correção do erro com atribuição da variável
-        echo "Opção selecionada: " . $selectOption;
-        echo "<p>Gestante?</p>";
-        echo "<label><input type='radio' name='opcao' value='Sim' " . ($opcaoSelecionada == 'sim' ? 'checked' : '') . " /> Sim</label> 
-            <label><input type='radio' name='opcao' value='Nao' " . ($opcaoSelecionada == 'nao' ? 'checked' : '') . " /> Não</label>";
-    } else {
-        echo "<p>Você não é gestante.</p>";
-    }
-}
-
-// Chamada da função
-?>
-
-
-<?php
-$locais = array(
-    "nãodefinido" => "Bairro ainda não selecionado",
-    "aerolandia" => "Regional 6 e território 26",
-    "aeroporto" => "Regional 4 e território 18",
-    "aldeota" => "Regional 2 e território 7",
-    "altodabalanca" => "Regional 6 e território 27",
-    "alvaroweyne" => "Regional 2 e território 7",
-    "amadeufurtado" => "Regional 1 e território 4",
-    "antoniobezerra" => "Regional 3 e território 13",
-    "barradoceara" => "Regional 1 e território 2",
-    "belavista" => "Regional 6 e território 27",
-    "benfica" => "Regional 1 e território 3",
-    "bomfuturo" => "Regional 3 e território 13",
-    "boavista" => "Regional 3 e território 11",
-    "bomjardim" => "Regional 3 e território 12",
-    "bonsucesso" => "Regional 3 e território 12",
-    "caisdoporto" => "Regional 1 e território 1",
-    "cajazeiras" => "Regional 3 e território 12",
-    "cambeba" => "Regional 4 e território 18",
-    "carlitopamplona" => "Regional 2 e território 7",
-    "centro" => "Regional 1 e território 1",
-    "cidade2" => "Regional 2 e território 6",
-    "cidadedosf" => "Regional 4 e território 17",
-    "coac" => "Regional 5 e território 20",
-    "coco" => "Regional 4 e território 17",
-    "conjuntoceara1" => "Regional 5 e território 20",
-    "conjuntoceara2" => "Regional 5 e território 20",
-    "cristoredentor" => "Regional 2 e território 6",
-    "curio" => "Regional 6 e território 26",
-    "damas" => "Regional 2 e território 6",
-    "delourdes" => "Regional 1 e território 3",
-    "democritorocha" => "Regional 5 e território 21",
-    "dende" => "Regional 6 e território 25",
-    "dionisiotorres" => "Regional 2 e território 7",
-    "domlustosa" => "Regional 4 e território 17",
-    "dunas" => "Regional 4 e território 17",
-    "edsonqueiroz" => "Regional 4 e território 18",
-    "fariasbrito" => "Regional 1 e território 2",
-    "floresta" => "Regional 1 e território 3",
-    "genibau" => "Regional 5 e território 21",
-    "guajeru" => "Regional 6 e território 26",
-    "granjaportugal" => "Regional 5 e território 21",
-    "granjalisboa" => "Regional 5 e território 20",
-    "henriquejorge" => "Regional 4 e território 17",
-    "itaoca" => "Regional 6 e território 26",
-    "itaperi" => "Regional 4 e território 16",
-    "jacarecanga" => "Regional 1 e território 1",
-    "jardimamerica" => "Regional 2 e território 6",
-    "jardimguanabara" => "Regional 4 e território 17",
-    "jardimdasoliveiras" => "Regional 5 e território 19",
-    "jardimiracema" => "Regional 2 e território 6",
-    "joaquimtavora" => "Regional 2 e território 7",
-    "josebonifacio" => "Regional 1 e território 3",
-    "josedealencar" => "Regional 5 e território 21",
-    "lagoaredonda" => "Regional 4 e território 17",
-    "maraponga" => "Regional 4 e território 16",
-    "meireles" => "Regional 2 e território 5",
-    "messejana" => "Regional 6 e território 26",
-    "montese" => "Regional 4 e território 16",
-    "mondubim" => "Regional 4 e território 17",
-    "montecastelo" => "Regional 1 e território 3",
-    "mourabrasil" => "Regional 2 e território 5",
-    "mucuripe" => "Regional 2 e território 5",
-    "otaviobonfim" => "Regional 2 e território 5",
-    "olavooliveira" => "Regional 4 e território 16",
-    "padreandrade" => "Regional 1 e território 3",
-    "papicu" => "Regional 2 e território 5",
-    "paupina" => "Regional 6 e território 26",
-    "parangaba" => "Regional 4 e território 17",
-    "parreao" => "Regional 4 e território 17",
-    "parquearaxa" => "Regional 6 e território 26",
-    "parqueiracema" => "Regional 2 e território 6",
-    "parquelandia" => "Regional 1 e território 3",
-    "parquemanibura" => "Regional 6 e território 25",
-    "parquesantamaria" => "Regional 5 e território 19",
-    "parquesaojose" => "Regional 6 e território 26",
-    "passare" => "Regional 4 e território 17",
-    "pedras" => "Regional 2 e território 7",
-    "pici" => "Regional 4 e território 16",
-    "pirambu" => "Regional 1 e território 1",
-    "praiadeiracema" => "Regional 2 e território 5",
-    "praiadofuturoi" => "Regional 2 e território 5",
-    "praiadofuturoii" => "Regional 2 e território 5",
-    "prainha" => "Regional 2 e território 5",
-    "presidentekennedy" => "Regional 4 e território 18",
-    "quintinocunha" => "Regional 3 e território 13",
-    "rodrigotorres" => "Regional 1 e território 2",
-    "sabia" => "Regional 6 e território 25",
-    "salinasaerolandia" => "Regional 6 e território 26",
-    "santafelicidade" => "Regional 5 e território 19",
-    "santamaria" => "Regional 6 e território 25",
-    "serrinha" => "Regional 6 e território 27",
-    "silvionor" => "Regional 4 e território 17",
-    "sitioconde" => "Regional 4 e território 18",
-    "sitioverde" => "Regional 4 e território 18",
-    "tancredoneves" => "Regional 3 e território 14",
-    "vilaellery" => "Regional 3 e território 13",
-    "vilalobos" => "Regional 4 e território 16",
-    "vilamanuelsatiro" => "Regional 3 e território 13",
-    "vilarodrigues" => "Regional 3 e território 13"
-);
-
-$bairro = 'naodefinido';
-if (isset($locais[$bairro])) {
-    echo "O bairro $bairro está localizado na região " . $locais[$bairro];
-} else {
-    echo "Não há informações disponíveis para o bairro $bairro.";
-};
-?>
-
-<!-- Não entendi código abaixo -->
-<label for="bairro">Selecione um bairro:</label>
-    <select name="bairro" id="bairro">
-        <option value="">Selecione</option>
-        <?php foreach ($locais as $bairro => $local) { ?>
-            <option value="<?php echo $bairro; ?>"><?php echo $bairro; ?></option>
-        <?php } ?>
-    </select>
-    <input type="submit" value="Obter Local" />
-</form>
-
-<?php
-if (isset($_POST['bairro'])) {
-    $bairro = $_POST['bairro'];
-    $local = isset($locais[$bairro]) ? $locais[$bairro] : "Bairro não encontrado";
-    echo "<p>Local: $local</p>";
-}
-?>
-<!-- Não entendi código acima -->
 
 <!-- Situação de rua -->
 
@@ -728,58 +1104,174 @@ possivelGestante($genero, $gestante);
                     <label class="question-objetiva" required>Gênero</label>
                     <select id="select-genero" class="select select-outro" onclick="selectGenero()" name="genero">
                         <option value=""></option>
-                        <option value="hcis">Homem cis</option>
-                        <option value="htrans">Homem trans</option>
-                        <option value="mulhercis">Mulher cis</option>
-                        <option value="mulhertrans">Mulher trans</option>
-                        <option value="outrogenero">Outro</option>
+                        <option value="masculino">Homem</option>
+                        <option value="feminino">Mulher</option>
+                        <option value="outrogenero"> Outro </option>
                     </select>
+
+                    <div id="outroGenero" style="display: none;">
+                        <label for="input-outro-genero">Qual gênero?</label>
+                        <input type="text" id="input-outro-genero" class="input-text" />
+                    </div>
+                </div>
+
+                <div class="box-dados">
+                    <label class="question-objetiva" required>Você é gestante?</label>
+                    <input type="radio" name="sim"> Sim
+                    <input type="radio" name="nao"> Não
+                    <input type="radio" name="naosei">Não sabe/não informou
                 </div>
                 
                 <div class="box-dados">
                     <label class="question-objetiva" required>Idade</label>
                     <input type="number" class="input-number" min="0" max="150" id="field" name="idade" required />
                 </div>
-            </div>
-            
-            <label class="question-objetiva" required>Estado civil</label>
-            <select id="field" class="select select-outro" onclick="selectEstadoCivil()" name="estadocivil" required>
-                <option value=""></option>
-                <option value="solteiro">Solteiro</option>
-                <option value="casado">Casado</option>
-                <option value="divorciado">Divorciado</option>
-                <option value="viuvo">Viúvo</option>
-                <option value="outroestadocivil">Outro</option>
-            </select>
-            
-            <div id="inputOcultoEstadoCivil">
-                Qual(is) outro(s) estado(s) civil(is)?
-                <input type="text" class="input-text" />
-            </div>
-            
-            <label class="question-objetiva" required>Escolaridade</label>
-            <select id="field" class="select select-outro" onclick="selectEscolaridade()" name="escolaridade" required>
-                <option value=""></option>
-                <option value="fundamentalincompleto">Fundamental incompleto</option>
-                <option value="fundamentalcompleto">Fundamental completo</option>
-                <option value="medioincompleto">Médio incompleto</option>
-                <option value="mediocompleto">Médio completo</option>
-                <option value="superiorincompleto">Superior incompleto</option>
-                <option value="superiorcompleto">Superior completo</option>
-                <option value="posgraduacao">Pós-graduação</option>
-                <option value="outroescolaridade">Outro</option>
-            </select>
-            
-            <div id="inputOcultoEscolaridade">
-                Qual(is) outro(s) nível(is) de escolaridade?
-                <input type="text" class="input-text" />
-            </div>
-            
+
+                <div class="box-dados">
+                    <label class="question-objetiva" required>Você é uma pessoa com deficiência</label>
+                    <input type="radio" name="sim"> Sim
+                    <input type="radio" name="nao"> Não
+                    <input type="radio" name="naosei">Não sabe/não informou
+                </div>
+
+                <div class="box-dados">
+                    <label class="question-objetiva" required>Endereço:</label>
+                    <input type="text" class="input-number" id="field" name="endereco" required />
+                </div>
+
+
             <div class="box-dados">
-                <label class="question-objetiva">Ocupação</label>
-                <input type="text" class="input-text" id="field" name="ocupacao" />
-            </div>
-            
+                <select id="city">
+                    <option value="aerolandia">Aerolândia</option>
+                    <option value="aeroporto">Aeroporto</option>
+                    <option value="aldeota">Aldeota</option>
+                    <option value="altodabalanca">Alto da Balança</option>
+                    <option value="alvaroweyne">Álvaro Weyne</option>
+                    <option value="ancuri">Ancuri</option>
+                    <option value="amadeufurtado">Amadeu Furtado</option>
+                    <option value="antoniobezerra">Antonio Bezerra</option>
+                    <option value="aracape">Aracapé</option>
+                    <option value="austrannunes">Austran Nunes</option>
+                    <option value="barradoceara">Barra do Ceará</option>
+                    <option value="barroso">Barroso</option>
+                    <option value="belavista">Bela Vista</option>
+                    <option value="benfica">Benfica</option>
+                    <option value="bomfuturo">Bom Futuro</option>
+                    <option value="boavista">Boa Vista</option>
+                    <option value="bomjardim">Bom Jardim</option>
+                    <option value="bonsucesso">Bonsucesso</option>
+                    <option value="caisdoporto">Cais do Porto</option>
+                    <option value="cajazeiras">Cajazeiras</option>
+                    <option value="cambeba">Cambeba</option>
+                    <option value="canindezinho">Canindezinho</option>
+                    <option value="carlitopamplona">Carlito Pamplona</option>
+                    <option value="centro">Centro</option>
+                    <option value="cidade2">Cidade 2</option>
+                    <option value="cidadedosf">Cidade dos Funcionários</option>
+                    <option value="coac">Coacu</option>
+                    <option value="coco">Coco</option>
+                    <option value="coite">Coité</option>
+                    <option value="conjuntoceara1">Conjunto Ceará 1</option>
+                    <option value="conjuntoceara2">Conjunto Ceará 2</option>
+                    <option value="conjuntoesperanca">Conjunto Esperança</option>
+                    <option value="conjuntopalmeiras">Conjunto Palmeiras</option>
+                    <option value="coutofernandes">Couto Fernandes</option>
+                    <option value="cristoredentor">Cristo Redentor</option>
+                    <option value="curio">Curió</option>
+                    <option value="damas">Damas</option>
+                    <option value="delourdes">De Lourdes</option>
+                    <option value="democritorocha">Demócrito Rocha</option>
+                    <option value="dende">Dendê</option>
+                    <option value="diasmacedo">Dias Macedo</option>
+                    <option value="dionisiotorres">Dionísio Torres</option>
+                    <option value="domlustosa">Dom Lustosa</option>
+                    <option value="dunas">Dunas</option>
+                    <option value="edsonqueiroz">Edson Queiroz</option>
+                    <option value="fariasbrito">Farias Brito</option>
+                    <option value="fatima">Fátima</option>
+                    <option value="floresta">Floresta</option>
+                    <option value="genibau">Genibaú</option>
+                    <option value="guajeru">Guajeru</option>
+                    <option value="guararapes">Guararapes</option>
+                    <option value="granjaportugal">Granja Portugal</option>
+                    <option value="granjalisboa">Granja Lisboa</option>
+                    <option value="henriquejorge">Henrique Jorge</option>
+                    <option value="itaoca">Itaoca</option>
+                    <option value="itaperi">Itaperi</option>
+                    <option value="jacarecanga">Jacarecanga</option>
+                    <option value="jangurussu">Jangurussu</option>
+                    <option value="jardimamerica">Jardim América</option>
+                    <option value="jardimcearense">Jardim Cearense</option>
+                    <option value="jardimguanabara">Jardim Guanabara</option>
+                    <option value="jardimdasoliveiras">Jardim das Oliveiras</option>
+                    <option value="jardimiracema">Jardim Miracema</option>
+                    <option value="joaquimtavora">Joaquim Távora</option>
+                    <option value="joaoxxiii">João XXIII</option>
+                    <option value="josebonifacio">José Bonifácio</option>
+                    <option value="josedealencar">José de Alencar</option>
+                    <option value="lagoaredonda">Lagoa Redonda</option>
+                    <option value="lucianocavalcante">Luciano Cavalcante</option>
+                    <option value="maraponga">Maraponga</option>
+                    <option value="manueldiasbranco">Manuel Dias Branco</option>
+                    <option value="meireles">Meireles</option>
+                    <option value="messejana">Messejana</option>
+                    <option value="montese">Montese</option>
+                    <option value="mondubim">Mondubim</option>
+                    <option value="montecastelo">Monte Castelo</option>
+                    <option value="mourabrasil">Moura Brasil</option>
+                    <option value="mucuripe">Mucuripe</option>
+                    <option value="novomondubim">Novo Mondubim</option>
+                    <option value="otaviobonfim">Otávio Bonfim</option>
+                    <option value="olavooliveira">Olavo Oliveira</option>
+                    <option value="padreandrade">Padre Andrade</option>
+                    <option value="panamericano">Panamericano</option>
+                    <option value="papicu">Papicu</option>
+                    <option value="paupina">Paupina</option>
+                    <option value="parangaba">Parangaba</option>
+                    <option value="parreao">Parreão</option>
+                    <option value="parquearaxa">Parque Araxá</option>
+                    <option value="parquedoisirmaos">Parque Dois Irmãos</option>
+                    <option value="parqueiracema">Parque Iracema</option>
+                    <option value="parquelandia">Parquelândia</option>
+                    <option value="parquemanibura">Parque Manibura</option>
+                    <option value="parquesantamaria">Parque Santa Maria</option>
+                    <option value="parquesaojose">Parque São José</option>
+                    <option value="passare">Passaré</option>
+                    <option value="pedras">Pedras</option>
+                    <option value="pici">Pici</option>
+                    <option value="pirambu">Pirambu</option>
+                    <option value="planaltoayrtonsenna">Planalto Ayrton Senna</option>
+                    <option value="praiadeiracema">Praia de Iracema</option>
+                    <option value="praiadofuturoi">Praia do Futuro I</option>
+                    <option value="praiadofuturoii">Praia do Futuro II</option>
+                    <option value="prefeitojosewalter">Prefeito José Walter</option>
+                    <option value="presidentekennedy">Presidente Kennedy</option>
+                    <option value="presidentevargas">Presidente Vargas</option>
+                    <option value="quintinocunha">Quintino Cunha</option>
+                    <option value="rodolfoteofilo">Rodolfo Teófilo</option>
+                    <option value="sabiguaba">Sabiguaba</option>
+                    <option value="salinas">Salinas</option>
+                    <option value="saobento">São Bento</option>
+                    <option value="saogerardo">São Gerardo</option>
+                    <option value="saojoaodotauape">São João do Tauape</option>
+                    <option value="serrinha">Serrinha</option>
+                    <option value="siqueira">Siqueira</option>
+                    <option value="varjota">Varjota</option>
+                    <option value="vicentepizon">Vicente Pizon</option>
+                    <option value="vilaellery">Vila Ellery</option>
+                    <option value="vilamanuelsatiro">Vila Manuel Sátiro</option>
+                    <option value="vilaperi">Vila Peri</option>
+                    <option value="vilavelha">Vila Velha</option>
+                    <option value="vilauniao">Vila União</option>
+                </select>
+
+                <div class="box-dados">
+                    <label class="question-objetiva" required>Em situação de rua</label>
+                    <input type="radio" name="sim"> Sim
+                    <input type="radio" name="nao"> Não
+                    <input type="radio" name="naosei">Não sabe/não informou
+                </div>
+
             <label required>Número de crianças que residem na casa (usuário ou familiar): </label>
             <div class="inputs-numbers--kids" name="kidscasa">
                 <input type="number" min="0" class="number-input" id="field" /> <p>Crianças de 0-5 anos</p>
@@ -790,122 +1282,119 @@ possivelGestante($genero, $gestante);
         
         <section class="parte-tres">
             <h3>Caracterização do Usuário e da Situação Problema</h3>
-            <div class="box-dados-iniciais">
-                <div class="box-dados">
-                    <label class="question-objetiva" required>Usa álcool?</label>
-                    <select id="field" class="select select-outro" onclick="selectAlcool()" name="alcool" required>
-                        <option value=""></option>
-                        <option value="sim">Sim</option>
-                        <option value="nao">Não</option>
-                        <option value="naosabe">Não sabe</option>
-                    </select>
-                </div>
-                
-                <div id="inputOcultoAlcool" required>
-                    Há quanto tempo faz uso de álcool?
-                    <input type="text" class="input-text" />
-                </div>
-            </div>
-            
-            <div class="box-dados-iniciais">
-                <div class="box-dados">
-                    <label class="question-objetiva" required>Usa drogas?</label>
-                    <select id="field" class="select select-outro" onclick="selectDrogas()" name="drogas" required>
-                        <option value=""></option>
-                        <option value="sim">Sim</option>
-                        <option value="nao">Não</option>
-                        <option value="naosabe">Não sabe</option>
-                    </select>
-                </div>
-                
-                <div id="inputOcultoDrogas" required>
-                    Quais drogas utiliza?
-                    <input type="text" class="input-text" />
-                </div>
-            </div>
-            
-            <div class="box-dados-iniciais">
-                <div class="box-dados">
-                    <label class="question-objetiva" required>Problema de saúde</label>
-                    <select id="field" class="select select-outro" onclick="selectSaude()" name="saude" required>
-                        <option value=""></option>
-                        <option value="sim">Sim</option>
-                        <option value="nao">Não</option>
-                        <option value="naosabe">Não sabe</option>
-                    </select>
-                </div>
-                
-                <div id="inputOcultoSaude" required>
-                    Qual é o problema de saúde?
-                    <input type="text" class="input-text" />
-                </div>
-            </div>
-            
-            <div class="box-dados-iniciais">
-                <div class="box-dados">
-                    <label class="question-objetiva" required>Problema de saúde mental</label>
-                    <select id="field" class="select select-outro" onclick="selectSaudeMental()" name="saudemental" required>
-                        <option value=""></option>
-                        <option value="sim">Sim</option>
-                        <option value="nao">Não</option>
-                        <option value="naosabe">Não sabe</option>
-                    </select>
-                </div>
-                
-                <div id="inputOcultoSaudeMental" required>
-                    Qual é o problema de saúde mental?
-                    <input type="text" class="input-text" />
-                </div>
-            </div>
-            
-            <label class="question-objetiva">Qual é a situação problema?</label>
-            <textarea id="field" class="textarea" required></textarea>
-            
-            <label class="question-objetiva">Quanto tempo o problema perdura?</label>
-            <input type="text" class="input-text" id="field" required />
-            
-            <div class="box-dados">
-                <label class="question-objetiva">O problema já ocorreu anteriormente?</label>
-                <select id="field" class="select select-outro" onclick="selectProblemaAnterior()" name="problemaanterior">
-                    <option value=""></option>
-                    <option value="sim">Sim</option>
-                    <option value="nao">Não</option>
-                    <option value="naosabe">Não sabe</option>
-                </select>
-            </div>
-            
-            <div id="inputOcultoProblemaAnterior">
-                Qual é o histórico do problema?
-                <input type="text" class="input-text" />
-            </div>
-        </section>
+            <div class="box-wrapper-subs">
+                <label class="question-objetiva">Qual(is) tipo(s) de substâncias psicoativas já fez uso na vida?</label>
+                <div class="checkbox-field">
+                    <ul>
+                        <li><input type="checkbox" id="field"> Álcool</li>
+                        <li><input type="checkbox" id="field"> Tabaco, cigarro, vaping</li>
+                        <li><input type="checkbox" id="field"> Crack(Mesclado, pitio, raspa)</li>
+                        <li><input type="checkbox" id="field"> Macoha(Shank, haxixe, k2)</li>
+                        <li><input type="checkbox" id="field"> Cocaína(Merla, oxi...)</li>
+                        </ul>
+                        
+                        <ul>
+                        <li><input type="checkbox" id="field"> Solventes(Cola, loló, lança perfume, anti-respingo de solda)</li> 
+                        <li><input type="checkbox" id="field"> Tranquilizantes(Diazepam, rivotril, ripinol...)</li>
+                        <li><input type="checkbox" id="field"> Anestésicos(Boa noite cinderela, ketamina)</li>
+                        <li><input type="checkbox" id="field"> Alucinógenos sintéticos(LSD, Doce, DMT, aranha)</li> 
+                        <li><input type="checkbox" id="field"> Alucinógenos naturais(Cogumelo, zabumba, Ahayuaska, Sto Daime, Ibogaína)</li>
+                        </ul>
         
-        <section class="parte-quatro">
-            <h3>Encaminhamentos</h3>
-            <div class="box-dados">
-                <label class="question-objetiva">Encaminhado para:</label>
-                <select id="field" class="select select-outro" onclick="selectEncaminhado()" name="encaminhado">
-                    <option value=""></option>
-                    <option value="servicosocial">Serviço Social</option>
-                    <option value="psicologia">Psicologia</option>
-                    <option value="psiquiatria">Psiquiatria</option>
-                    <option value="nutricao">Nutrição</option>
-                    <option value="terapiaocupacional">Terapia Ocupacional</option>
-                    <option value="outroencaminhamento">Outro</option>
-                </select>
-            </div>
-            
-            <div id="inputOcultoEncaminhado">
-                Qual(is) outro(s) encaminhamento(s)?
-                <input type="text" class="input-text" />
-            </div>
-            
-            <label class="question-objetiva">Data do encaminhamento:</label>
-            <input type="date" class="input-date" id="field" name="dataencaminhamento" />
-            
-            <label class="question-objetiva">Observações:</label>
-            <textarea id="field" class="textarea"></textarea>
-        </section>
+                        <ul>
+                        <li><input type="checkbox" id="field"> Anfetaminas(Rebite, speed, ritalina)</li>
+                        <li><input type="checkbox" id="field"> Opióides(Remédios para dor, morfina, metadona, tramal)</li>
+                        <li><input type="checkbox" id="field"> Ecstasy(Bala, MDMA, MD, Mandy)</li>
+                        <li><input type="checkbox" id="field"> Heroína</li>
+                        <li><input type="checkbox" id="field"> Não sabe/Não respondeu</li>
+                        <li>
+                        </ul>
+                        
+                        <ul>
+                        <input type="checkbox" id="field"> Outras(as) <strong>Quais?</strong> <input type="text" class="input-text" id="field"></li>
+                        </ul>
+                </div>
+
+                <label class="question-objetiva">Qual é a primeira substância que você fez uso?</label>
+                <input type="text" class="input-text" id="field">
+                <label class="question-objetiva">Qual ou quais substâncias faz uso atualmente</label>
+                <input type="text" class="input-text" id="field">
+                <label class="question-objetiva">Usa há quanto tempo?</label>
+                <input type="text" class="input-text" id="field">
+                <label class="question-objetiva">Quanto tempo após iniciar o uso procurou tratamento pela primeira vez?</label>
+                <input type="text" class="input-text" id="field">
+                <label class="question-objetiva">Onde procurou ajuda/tratamento pela primeira vez?</label>
+                <input type="text" class="input-text" id="field">
+
+                <label class="question-objetiva">Qual ou quais órgãos/instituições que faz atendimento a usuários de álcool e/ou outras drogas você já foi atendido?</label>
+                <div class="checkbox-field">
+                    <ul><li><input type="checkbox" id="field"> CAPS AD</li>
+                        <li><input type="checkbox" id="field"> Unidade básica de saúde</li>
+                        <li><input type="checkbox" id="field"> SHR AD</li>
+                        <li><input type="checkbox" id="field"> Hospital Psiquiátrico</li>
+                        <li><input type="checkbox" id="field"> Comunidade terapêutica</li>
+                        </ul>
+                        <ul>
+                        <li><input type="checkbox" id="field"> Instituições religiosas</li>
+                        <li><input type="checkbox" id="field"> Atendimento Psicológico</li>
+                        <li><input type="checkbox" id="field"> Atendimento Psiquiátrico</li>
+                        <li><input type="checkbox" id="field"> Grupos de ajuda mutua</li>
+                        <li><input type="checkbox" id="field"> Unidade de acolhimento</li>
+                        </ul>
+                        <ul>
+                            <li><input type="checkbox"> Outro(s)
+                                <strong>Qual(is)</strong>
+                                <input type="text" class="input-text" id="field"></li> 
+                        </ul>
+                </div>
+                <label class="question-objetiva">Já pensou em suicídio alguma vez</label>
+                <div class="input-radio">
+                    <ul class="radio-list">
+                        <li><input type="radio" class="radio-input" value="sim" id="field" name='radio'/> Sim
+                        </li>
+                    <li><input type="radio" class="radio-input" value="nao" id="field" name='radio'/>
+                        Não</li>
+                        <li><input type="radio"  class="radio-input" value="nao-responder" id="field" name='radio'/>
+                            Prefiro não responder.</li>
+                    </ul>
+                </div>
+                
+
+                <label class="question-objetiva">Qual é a expectativa do usuário e/ou da família em relação a esse atendimento?</label>
+                <div class="checkbox-field">
+                    <ul> <strong>Internação</strong>
+                        <li> <input type="checkbox" id="field"/> Internação voluntária</li>
+                        <li><input type="checkbox" id="field"/> Internação involuntária</li>
+                        <li><input type="checkbox" id="field"/> Internação compulsória</li>
+                    </ul>
+                    <ul>
+                        <li> <input type="checkbox" id="field"/> Orientação</li>
+                        <li> <input type="checkbox" id="field"/> Suporte Psicológico</li>
+                        <li> <input type="checkbox" id="field"/> Tratamento na rede intersetorial álcool e drogas municipal</li>
+                    </ul>
+
+                    <ul>
+                        <li> <input type="checkbox" id="field"/> Outra</li> <strong>Qual?(is)</strong> <input type="text" class="input-text" id="field">
+
+                    </ul>
+                </div>
+                <label class="question-objetiva">Gostaria de atendimento presencial na CPDrogas?</label>
+                <ul class="radio-list">
+                    <li><input type="radio" class="radio-input" value="sim" id="field" name='radio'/> Sim
+                    </li>
+                <li><input type="radio"  class="radio-input" value="nao" id="field" name='radio'/> Não</li>
+                
+                </ul>
+
+                <h5 class="question-objetiva">Relato do atendimento</h5>
+                <input type="text" class="input-text" id="field">
+                
+                <h5 class="question-objetiva">Encaminhamento</h5>
+                <input type="text" class="input-text" id="field">
+
+                <p class="question-objetiva">Fortaleza</p> <input type="datetime-local" class="input-text"/>
+                <p class="question-objetiva">Profissional responsável pelo acolhimento/encaminhamento</p> <input type="text" class="input-text" id="field">
+
         
         <button type="submit" class="btn-submit">Enviar</button>
     </form>
