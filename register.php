@@ -1,6 +1,7 @@
 <?php
 if (isset($_POST['register'])) {
-    require('./config/db.php');
+    // require('./config/db.php');
+    include('./config/db.php');
 
     $nomeusuario = filter_var($_POST["nomeusuario"], FILTER_SANITIZE_STRING);
     $useremail = filter_var($_POST["useremail"], FILTER_SANITIZE_EMAIL);

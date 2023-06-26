@@ -1,18 +1,20 @@
+rascunho do db na extensão mysqli
+
 <?php
 $host = 'localhost';
 $usuario = 'root';
 $senha = '';
 $banco = 'cpdrogas-project';
 
-try {
-    $conn = new PDO("mysql:host=$host;dbname=$banco;charset=utf8", $usuario, $senha);
-    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+$conn = mysqli_connect($host, $usuario, $senha, $banco);
+
+if ($conn) {
     echo "Conexão estabelecida com sucesso.";
 
     if (isset($_POST['nomeusuario']) && isset($_POST['useremail']) && isset($_POST['senha'])) {
-        $nome = $_POST['nomeusuario'];
-        $email = $_POST['useremail'];
-        $senha = $_POST['senha'];
+        $nome = mysqli_real_escape_string($conn, $_POST['nomeusuario']);
+        $email = mysqli_real_escape_string($conn, $_POST['useremail']);
+        $senha = mysqli_real_escape_string($conn, $_POST['senha']);
 
         // Validação dos campos
         if (empty($nome) || empty($email) || empty($senha)) {
@@ -23,18 +25,21 @@ try {
 
             // Inserção no banco de dados
             $stmt = $conn->prepare("INSERT INTO users (nome, email, senha) VALUES (?, ?, ?)");
-            $stmt->execute([$nome, $email, $hashSenha]);
+            $stmt->bind_param("sss", $nome, $email, $hashSenha);
 
-            if ($stmt->rowCount() > 0) {
+            if ($stmt->execute()) {
                 echo "Cadastro feito com sucesso!";
             } else {
-                echo "Erro ao inserir dados.";
+                echo "Erro ao inserir dados: " . $stmt->error;
             }
         }
     } else {
         echo "Campos de formulário não estão definidos.";
     }
-} catch (PDOException $e) {
-    echo "Falha na conexão: " . $e->getMessage();
+
+    // Fechar a conexão
+    mysqli_close($conn);
+} else {
+    echo "Falha na conexão: " . mysqli_connect_error();
 }
-?>
+?> 
