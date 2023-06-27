@@ -1,44 +1,41 @@
 <?php
-if (isset($_POST['register'])) {
-    require('./config/db.php');
-    
-    $nomeusuario = filter_var($_POST["nomeusuario"], FILTER_SANITIZE_STRING);
-    $useremail = filter_var($_POST["useremail"], FILTER_SANITIZE_EMAIL);
-    $senha = filter_var($_POST["senha"], FILTER_SANITIZE_STRING);
-    $passwordHashed = password_hash($senha, PASSWORD_DEFAULT);
+try {
+    $conn = new PDO("mysql:host=localhost;dbname=cpdrogas-project", "root", "");
+    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    $sql = "INSERT INTO users (name, email, password) VALUES (?, ?, ?)";
+    if (isset($_POST['register'])) {
+        $nomeusuario = filter_var($_POST["nomeusuario"], FILTER_SANITIZE_STRING);
+        $useremail = filter_var($_POST["useremail"], FILTER_SANITIZE_EMAIL);
+        $senha = filter_var($_POST["senha"], FILTER_SANITIZE_STRING);
+        $passwordHashed = password_hash($senha, PASSWORD_DEFAULT);
 
-    if (filter_var($useremail, FILTER_VALIDATE_EMAIL)) {
-        $stmt = $conn->prepare('SELECT * FROM users WHERE email = ?');
-        $stmt->bind_param("s", $useremail);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $totalUsers = $result->num_rows;
+        $sql = "INSERT INTO users (name, email, password) VALUES (?, ?, ?)";
 
-        echo $totalUsers . '<br>';
+        if (filter_var($useremail, FILTER_VALIDATE_EMAIL)) {
+            $stmt = $conn->prepare('SELECT * FROM users WHERE email = ?');
+            $stmt->bindParam(1, $useremail);
+            $stmt->execute();
+            $totalUsers = $stmt->rowCount();
 
-        if ($totalUsers > 0) {
-            $emailTaken = "Email já foi adicionado";
-        } else {
-            $stmt = $conn->prepare('INSERT INTO users (name, email, password) VALUES (?, ?, ?)');
-            $stmt->bind_param("sss", $nomeusuario, $useremail, $passwordHashed);
-            if ($stmt->execute()) {
-                echo "Cadastro feito com sucesso!";
+            echo $totalUsers . '<br>';
+
+            if ($totalUsers > 0) {
+                $emailTaken = "Email já foi adicionado";
             } else {
-                echo "Erro ao inserir dados: " . $stmt->error;
+                $stmt = $conn->prepare('INSERT INTO users (name, email, password) VALUES (?, ?, ?)');
+                $stmt->bindParam(1, $nomeusuario);
+                $stmt->bindParam(2, $useremail);
+                $stmt->bindParam(3, $passwordHashed);
+                if ($stmt->execute()) {
+                    echo "Cadastro feito com sucesso!";
+                } else {
+                    echo "Erro ao inserir dados: " . $stmt->errorInfo()[2];
+                }
             }
         }
-
-        try {
-            $conn = new PDO("mysql:host=localhost;dbname=cpdrogas-project", "root", "");
-            $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        } catch (PDOException $e) {
-            die("Erro na conexão com o banco de dados: " . $e->getMessage());
-        }
     }
-    $stmt->close();
-    $conn->close();
+} catch (PDOException $e) {
+    die("Erro na conexão com o banco de dados: " . $e->getMessage());
 }
 ?>
 
@@ -72,3 +69,4 @@ if (isset($_POST['register'])) {
 </div>
 
 <?php require('./inc/footer.html') ?>
+
