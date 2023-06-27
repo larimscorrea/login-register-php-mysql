@@ -16,7 +16,7 @@ try {
 
     // Conexão com o banco de dados
     try {
-        $pdo = new PDO("mysql:host=$host;dbname=$banco", $usuario, $senha);
+        $pdo = new PDO("mysql:host=$host;cpdrogas-project=$banco, $usuario, $senha");
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         echo "Conexão estabelecida com sucesso.";
 
