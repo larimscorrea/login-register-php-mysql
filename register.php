@@ -1,42 +1,29 @@
 <?php
-try {
-    $conn = new PDO("mysql:host=localhost;dbname=cpdrogas-project", "root", "");
-    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    if (isset($_POST['register'])) {
-        $nomeusuario = filter_var($_POST["nomeusuario"], FILTER_SANITIZE_STRING);
-        $useremail = filter_var($_POST["useremail"], FILTER_SANITIZE_EMAIL);
-        $senha = filter_var($_POST["senha"], FILTER_SANITIZE_STRING);
-        $passwordHashed = password_hash($senha, PASSWORD_DEFAULT);
+if(isset( $_POST['register.php'])) {
+    require('./config/db.php');
 
-        $sql = "INSERT INTO users (name, email, password) VALUES (?, ?, ?)";
+    $userName = filter_var( $_POST["userName"], FILTER_SANITIZE_STRING);
+    $userEmail = filter_var( $_POST["userEmail"], FILTER_SANITIZE_EMAIL);
+    $password = filter_var( $_POST["password"], FILTER_SANITIZE_STRING);
+    $passwordHashed = filter_var( $_POST["password"], PASSWORD_DEFAULT);
 
-        if (filter_var($useremail, FILTER_VALIDATE_EMAIL)) {
-            $stmt = $conn->prepare('SELECT * FROM users WHERE email = ?');
-            $stmt->bindParam(1, $useremail);
-            $stmt->execute();
-            $totalUsers = $stmt->rowCount();
+    if( filter_var($userEmail, FILTER_VALIDATE_EMAIL) ) {
+        $stmt = $pdo -> prepare('SELECT * FROM users WHERE email = ? ');
+        $stmt -> execute([$userEmail]);
+        $totalUsers = $stmt -> rowCount();
 
-            echo $totalUsers . '<br>';
+        if( $totalUsers > 0 ) {
+            $emailTaken = "E-mail já adicionado";
+        } else {
+            $stmt = $pdo -> prepare('INSERT into users(name, email, password) VALUES(? , ? , ? )');
+            $stmt -> execute( [ $userName, $userEmail, $passwordHashed] );
 
-            if ($totalUsers > 0) {
-                $emailTaken = "Email já foi adicionado";
-            } else {
-                $stmt = $conn->prepare('INSERT INTO users (name, email, password) VALUES (?, ?, ?)');
-                $stmt->bindParam(1, $nomeusuario);
-                $stmt->bindParam(2, $useremail);
-                $stmt->bindParam(3, $passwordHashed);
-                if ($stmt->execute()) {
-                    echo "Cadastro feito com sucesso!";
-                } else {
-                    echo "Erro ao inserir dados: " . $stmt->errorInfo()[2];
-                }
-            }
+            header('Location: http://localhost/cpdrogas/index.php');
         }
     }
-} catch (PDOException $e) {
-    die("Erro na conexão com o banco de dados: " . $e->getMessage());
 }
+
 ?>
 
 <?php require('./inc/header.html'); ?>

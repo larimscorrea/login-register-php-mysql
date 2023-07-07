@@ -1,40 +1,21 @@
 <?php
-$host = 'localhost';
-$usuario = 'root';
-$senha = '';
-$banco = 'cpdrogas-project';
 
-try {
-    $conn = new PDO("mysql:host=$host;dbname=$banco;charset=utf8", $usuario, $senha);
-    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    echo "Conexão estabelecida com sucesso.";
+    $host = 'localhost';
+    $user = 'root';
+    $password = '';
+    $dbname = 'cpdrogas-project';
 
-    if (isset($_POST['nomeusuario']) && isset($_POST['useremail']) && isset($_POST['senha'])) {
-        $nome = $_POST['nomeusuario'];
-        $email = $_POST['useremail'];
-        $senha = $_POST['senha'];
+    // set database source name
+    $dsn = 'mysql:host=' . $host . '; dbname=' . $dbname;
 
-        // Validação dos campos
-        if (empty($nome) || empty($email) || empty($senha)) {
-            echo "Todos os campos devem ser preenchidos.";
-        } else {
-            // Melhoria: Use uma função de hash para armazenar a senha no banco de dados
-            $hashSenha = password_hash($senha, PASSWORD_DEFAULT);
+    try {
+        $pdo = new PDO($dsn, $user, $password);
+        $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_OBJ);
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-            // Inserção no banco de dados
-            $stmt = $conn->prepare("INSERT INTO users (nome, email, senha) VALUES (?, ?, ?)");
-            $stmt->execute([$nome, $email, $hashSenha]);
-
-            if ($stmt->rowCount() > 0) {
-                echo "Cadastro feito com sucesso!";
-            } else {
-                echo "Erro ao inserir dados.";
-            }
-        }
-    } else {
-        echo "Campos de formulário não estão definidos.";
+        echo "Conectado com sucesso!";
+        
+    } catch (PDOException $e) {
+        echo "Falha na conexão: " . $e->getMessage();
     }
-} catch (PDOException $e) {
-    echo "Falha na conexão: " . $e->getMessage();
-}
 ?>
