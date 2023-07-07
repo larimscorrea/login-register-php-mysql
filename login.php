@@ -45,6 +45,7 @@ if (isset($_POST['login'])) {
                     <label for="password">Senha</label>
                     <input required type="password" name="senha" class="form-control" />
                 </div>
+                <br />
                 <button name="login" type="submit" class="btn btn-primary">Login</button>
             </form>
         </div>

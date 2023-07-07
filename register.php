@@ -62,6 +62,7 @@ try {
                     <label for="password">Senha</label>
                     <input required type="password" name="senha" class="form-control" />
                 </div>
+                <br />
                 <button name="register" type="submit" class="btn btn-primary">Registrar</button>
             </form>
         </div>
