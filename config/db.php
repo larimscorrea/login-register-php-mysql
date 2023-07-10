@@ -3,7 +3,7 @@
     $host = 'localhost';
     $user = 'root';
     $password = '';
-    $dbname = 'cpdrogas-project';
+    $dbname = 'cpdrogas';
 
     // set database source name
     $dsn = 'mysql:host=' . $host . '; dbname=' . $dbname;

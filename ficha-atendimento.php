@@ -12,11 +12,11 @@ try {
     $host = 'localhost';
     $usuario = 'root';
     $senha = '';
-    $banco = 'cpdrogas-project';
+    $banco = 'cpdrogas';
 
     // Conexão com o banco de dados
     try {
-        $pdo = new PDO("mysql:host=$host;cpdrogas-project=$banco, $usuario, $senha");
+        $pdo = new PDO("mysql:host=$host;cpdrogas=$banco, $usuario, $senha");
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         echo "Conexão estabelecida com sucesso.";
 

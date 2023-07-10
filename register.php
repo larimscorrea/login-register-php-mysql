@@ -34,12 +34,12 @@ if(isset( $_POST['register.php'])) {
         <div class="card-body">
             <form action="/config/db.php" method="POST">
                 <div class="form-group">
-                    <label for="nomeusuario">Usuário</label>
-                    <input required type="text" name="nomeusuario" class="form-control" />
+                    <label for="userName">Usuário</label>
+                    <input required type="text" name="userName" class="form-control" />
                 </div>
                 <div class="form-group">
-                    <label for="useremail">E-mail</label>
-                    <input required type="email" name="useremail" class="form-control" />
+                    <label for="userEmail">E-mail</label>
+                    <input required type="email" name="userEmail" class="form-control" />
                     <br />
                     <?php if(isset($emailTaken)) { ?>
                         <p style="background-color: red"><?php echo $emailTaken ?></p>
@@ -47,13 +47,15 @@ if(isset( $_POST['register.php'])) {
                 </div>
                 <div class="form-group">
                     <label for="password">Senha</label>
-                    <input required type="password" name="senha" class="form-control" />
+                    <input required type="password" name="password" class="form-control" />
                 </div>
                 <br />
                 <button name="register" type="submit" class="btn btn-primary">Registrar</button>
             </form>
         </div>
+
     </div>
+    
 </div>
 
 <?php require('./inc/footer.html') ?>
